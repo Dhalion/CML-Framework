@@ -4,7 +4,7 @@ require_once 'app/admin/cml-load.php';
 use CML\Classes\Router;
 use CML\Classes\DB;
 
-$db = new DB();
+$db = new DB(false);
 $app = new Router();
 
 //Project settings
@@ -28,7 +28,7 @@ $app->addScript($app->compress("scripts.js"));
 $app->addFooter();
 
 $app->addRoute('GET', '/', function () use ($app) {
-    $apiData = $app->useController("ApiController", "getRepoData", ['url' => 'https://docs.callmeleon.de/data']);
+    $apiData = $app->useController("ApiController", "getRepoData", ['url' => 'https://docs.callmeleon.de/api/data']);
     $app->setTitle("Thank you! | CML - Framework");
     $app->view("home.php", $apiData);
 }, "home");
