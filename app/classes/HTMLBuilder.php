@@ -15,6 +15,11 @@ namespace CML\Classes;
 abstract class HTMLBuilder {
     use Functions\Functions;
 
+    /**
+     * @var HTMLCache The HTML cache instance
+     */
+    private Cache $htmlCache;
+
     const BEFORE_HEAD = 'before_head';
     const TOP_HEAD = 'top_head';
     const BOTTOM_HEAD = 'bottom_head';
@@ -636,9 +641,19 @@ abstract class HTMLBuilder {
      * Builds the complete HTML structure.
      */
     protected function buildHTML(){
-        ob_start();
+
+        $this->htmlCache = new Cache(CACHE_PATH);
+
+        $cacheKey = $this->htmlCache->url;
+
+        if (PRODUCTION && $this->htmlCache->get($cacheKey)) {
+            echo $this->htmlCache->get($cacheKey);
+            exit;
+        }
+
         $attrHTML = $this->_arrToHtmlAttrs($this->htmlAttr);
         $attrBody = $this->_arrToHtmlAttrs($this->bodyAttr);
+        ob_start();
         ?>
         <!DOCTYPE html>
         <html lang="<?= $this->langAttr ?>"<?= $attrHTML?>>
@@ -661,16 +676,15 @@ abstract class HTMLBuilder {
         <?= "<body{$attrBody}>"; ?>
         <?= $this->_getHookContent(self::TOP_BODY); ?>
         <?= $this->header; ?>
-
-        <?= $this->outputContent ?>
-
+        <?= $this->minifyHTML($this->outputContent)?> 
         <?= $this->_getHookContent(self::BEFORE_BODY); ?>
         <?= $this->footer; ?>
         <?= PHP_EOL.'</body>'; ?>
         <?= $this->_getHookContent(self::AFTER_BODY); ?>
         <?= PHP_EOL.'</html>'; ?>
         <?php
-        echo $this->minifyHTML(preg_replace('/\h*<([^>]*)>\h*/', '<$1>', ob_get_clean()));
+        echo $output = $this->minifyHTML(preg_replace('/\h+(?=<)/', ' ', ob_get_clean()));
+        $this->htmlCache->set($cacheKey, $output);
         exit;
     }
 

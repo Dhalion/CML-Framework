@@ -605,7 +605,7 @@ class Router extends \CML\Classes\HTMLBuilder{
             }
         }, $content);
         
-        echo $this->minifyHTML($content);
+        echo $content;
     }
 
     /**
@@ -618,7 +618,7 @@ class Router extends \CML\Classes\HTMLBuilder{
         $sitePath = self::getRootPath($this->sitesPath . $siteName);
         $content = $this->_processFile($sitePath, $variables);
 
-        echo $this->minifyHTML($content);
+        echo $content;
     }
 
     
