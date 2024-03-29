@@ -5,3 +5,4 @@ errorlogfile.log
 cml-config.php
 /web/css/_min/*
 /web/js/_min/*
+cache/*
