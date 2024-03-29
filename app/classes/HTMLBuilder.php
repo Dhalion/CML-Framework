@@ -25,14 +25,14 @@ abstract class HTMLBuilder {
     const AFTER_BODY = 'after_body';
 
     /**
-     * @var bool Indicates whether the HTML has been built or not.
-     */
-    private bool $builded = false;
-
-    /**
      * @var bool Indicates whether the HTML should be minified or not.
      */
     private bool $minifyHTML = false;
+
+    /**
+     * @var string The output content of the HTMLBuilder class.
+     */
+    protected string $outputContent = "";
 
     /**
      * @var string The URL for AJAX requests.
@@ -635,34 +635,14 @@ abstract class HTMLBuilder {
     /**
      * Builds the complete HTML structure.
      */
-    public function build() {
-        if($this->builded === false){
-            $this->builded = true;
-            ob_start();
-            $this->_buildHtmlStart();
-            $this->_buildHead();
-            $this->_buildBody();
-            echo $this->minifyHTML(preg_replace('/\h*<([^>]*)>\h*/', '<$1>', ob_get_clean()));
-        }
-    }
-    
-    /**
-     * Builds the opening HTML tags and outputs any content hooks before the head.
-     */
-    protected function _buildHtmlStart() {
-        $attr = $this->_arrToHtmlAttrs($this->htmlAttr);
+    protected function buildHTML(){
+        ob_start();
+        $attrHTML = $this->_arrToHtmlAttrs($this->htmlAttr);
+        $attrBody = $this->_arrToHtmlAttrs($this->bodyAttr);
         ?>
         <!DOCTYPE html>
-        <html lang="<?= $this->langAttr ?>"<?= $attr?>>
+        <html lang="<?= $this->langAttr ?>"<?= $attrHTML?>>
         <?= $this->_getHookContent(self::BEFORE_HEAD); ?>
-        <?php
-    }
-    
-    /**
-     * Builds the head section of the HTML document with meta tags, title, scripts, and styles.
-     */
-    protected function _buildHead() {
-        ?>
         <head>
             <?= $this->_getHookContent(self::TOP_HEAD); ?>
             <meta charset="<?= $this->charsetAttr ?>">
@@ -677,20 +657,23 @@ abstract class HTMLBuilder {
             <?= $this->_getHookContent(self::BOTTOM_HEAD); ?>
         </head>
         <?= $this->_getHookContent(self::AFTER_HEAD); ?>
+        <?= $this->_getHookContent(self::BEFORE_BODY); ?>
+        <?= "<body{$attrBody}>"; ?>
+        <?= $this->_getHookContent(self::TOP_BODY); ?>
+        <?= $this->header; ?>
+
+        <?= $this->outputContent ?>
+
+        <?= $this->_getHookContent(self::BEFORE_BODY); ?>
+        <?= $this->footer; ?>
+        <?= PHP_EOL.'</body>'; ?>
+        <?= $this->_getHookContent(self::AFTER_BODY); ?>
+        <?= PHP_EOL.'</html>'; ?>
         <?php
+        echo $this->minifyHTML(preg_replace('/\h*<([^>]*)>\h*/', '<$1>', ob_get_clean()));
+        exit;
     }
 
-    /**
-     * Builds the body section of the HTML document with hooks, header content, etc.
-     */   
-    protected function _buildBody() {
-        $attr = $this->_arrToHtmlAttrs($this->bodyAttr);
-        echo $this->_getHookContent(self::BEFORE_BODY);
-        echo "<body{$attr}>";
-        echo $this->_getHookContent(self::TOP_BODY); 
-        echo $this->header;
-    }
-    
     /**
      * Builds meta tags in the head section based on the provided array of meta attributes.
      */
@@ -730,23 +713,5 @@ abstract class HTMLBuilder {
         foreach ($this->scripts as $script): ?>
             <script src=<?= $script ?>></script>
         <?php endforeach;
-    }
-
-    /**
-     * Close the application correctly.
-     */
-    protected function _build_end() {
-        ob_start();
-        echo $this->minifyHTML($this->_getHookContent(self::BEFORE_BODY));
-        echo $this->footer;
-        if ($this->builded) {
-            echo PHP_EOL.'</body>';
-        }
-        echo $this->_getHookContent(self::AFTER_BODY);
-        if ($this->builded) {
-            echo PHP_EOL.'</html>';
-        }
-        echo $this->minifyHTML(ob_get_clean());
-        exit;
     }
 }

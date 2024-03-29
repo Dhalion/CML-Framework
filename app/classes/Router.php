@@ -430,8 +430,10 @@ class Router extends \CML\Classes\HTMLBuilder{
                 die;
             } elseif (isset($this->errorPage['page'])) {
                 $this->setTitle($this->errorPage['title']);
+                ob_start();
                 $this->getSite($this->errorPage['page'], $this->errorPageVariables);
-                parent::_build_end();
+                $this->outputContent = ob_get_clean();
+                $this->buildHTML();
             } else {
                 $this->handleRouteNotFound($url, $method);
             }
@@ -465,6 +467,7 @@ class Router extends \CML\Classes\HTMLBuilder{
 
                 // Check "where" conditions
                 if ($this->_checkWhereConditions($matches, $routeData['where'] ?? array())) {
+                    ob_start();
                     // Execute global middleware function
                     if (!empty($this->globalMiddleware) && !in_array($url, $this->globalMiddleware["url"])) {
                         call_user_func($this->globalMiddleware["function"][0]);
@@ -482,7 +485,8 @@ class Router extends \CML\Classes\HTMLBuilder{
                     $this->_executeMiddleware('after', $url);
     
                     // Close the application
-                    (!$this->isApi && !$routeData['ajaxOnly']) ? parent::_build_end() : exit;
+                    (!$this->isApi && !$routeData['ajaxOnly']) ? $this->outputContent = ob_get_clean() : exit;
+                    $this->buildHTML();
                 } else {
                     return false;
                 }
@@ -601,7 +605,6 @@ class Router extends \CML\Classes\HTMLBuilder{
             }
         }, $content);
         
-        $this->build();
         echo $this->minifyHTML($content);
     }
 
@@ -615,7 +618,6 @@ class Router extends \CML\Classes\HTMLBuilder{
         $sitePath = self::getRootPath($this->sitesPath . $siteName);
         $content = $this->_processFile($sitePath, $variables);
 
-        $this->build();
         echo $this->minifyHTML($content);
     }
 
