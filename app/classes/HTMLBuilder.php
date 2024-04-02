@@ -635,10 +635,12 @@ abstract class HTMLBuilder extends Cache{
     /**
      * Builds the complete HTML structure.
      */
-    protected function buildHTML(){
-
+    protected function buildHTML(string $outputContent = ""){
+        
+        $this->outputContent = $outputContent;
         $attrHTML = $this->_arrToHtmlAttrs($this->htmlAttr);
         $attrBody = $this->_arrToHtmlAttrs($this->bodyAttr);
+
         ob_start();
         ?>
         <!DOCTYPE html>

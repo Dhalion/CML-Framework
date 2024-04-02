@@ -432,8 +432,7 @@ class Router extends \CML\Classes\HTMLBuilder{
                 $this->setTitle($this->errorPage['title']);
                 ob_start();
                 $this->getSite($this->errorPage['page'], $this->errorPageVariables);
-                $this->outputContent = ob_get_clean();
-                $this->buildHTML();
+                $this->buildHTML(ob_get_clean());
             } else {
                 $this->handleRouteNotFound($url, $method);
             }
@@ -469,31 +468,30 @@ class Router extends \CML\Classes\HTMLBuilder{
                 }
 
                 // Check "where" conditions
-                if ($this->_checkWhereConditions($matches, $routeData['where'] ?? array())) {
-                    ob_start();
-                    // Execute global middleware function
-                    if (!empty($this->globalMiddleware) && !in_array($url, $this->globalMiddleware["url"])) {
-                        call_user_func($this->globalMiddleware["function"][0]);
-                    }
-    
-                    // Execute middleware functions before the target function
-                    $this->_executeMiddleware('before', $url);
-    
-                    // Call the target function with the extracted parameter values
-                    $parameterValues = $this->_sanitizeStringsArray(array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY));
-                    $this->currentRouteParams = $parameterValues;
-                    call_user_func_array($routeData['target'], $parameterValues);
-    
-                    // Execute middleware functions after the target function
-                    $this->_executeMiddleware('after', $url);
-    
-                    // Close the application
-                    (!$this->isApi && !$routeData['ajaxOnly']) ? $this->outputContent = ob_get_clean() : exit;
-                    $this->buildHTML();
-                } else {
+                if (!$this->_checkWhereConditions($matches, $routeData['where'] ?? array())) {
                     return false;
                 }
-            }
+
+                ob_start();
+                // Execute global middleware function
+                if (!empty($this->globalMiddleware) && !in_array($url, $this->globalMiddleware["url"])) {
+                    call_user_func($this->globalMiddleware["function"][0]);
+                }
+
+                // Execute middleware functions before the target function
+                $this->_executeMiddleware('before', $url);
+
+                // Call the target function with the extracted parameter values
+                $parameterValues = $this->_sanitizeStringsArray(array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY));
+                $this->currentRouteParams = $parameterValues;
+                call_user_func_array($routeData['target'], $parameterValues);
+
+                // Execute middleware functions after the target function
+                $this->_executeMiddleware('after', $url);
+
+                // Close the application
+                (!$this->isApi && !$routeData['ajaxOnly']) ? $this->buildHTML(ob_get_clean()) : exit;
+            } 
         }
     }
     
