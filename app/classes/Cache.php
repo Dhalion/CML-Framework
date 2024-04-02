@@ -7,7 +7,7 @@ namespace CML\Classes;
  *
  * Cache provides methods for caching and retrieving HTML content.
  */
-class Cache {
+abstract class Cache {
     use Functions\Functions;
 
     /**
@@ -15,21 +15,22 @@ class Cache {
      */
     private string $cacheDir;
 
-    public string $url;
+    protected array $cacheConfig = array();
 
-    /**
-     * Constructor
-     *
-     * @param string $cacheDir The directory path where cache files will be stored
-     */
-    public function __construct(string $cacheDir) {
-        $this->cacheDir = self::getRootPath($cacheDir);
+    public function initCache() {
+        $this->cacheDir = self::getRootPath(CACHE_PATH);
         if (!file_exists($this->cacheDir)) {
             mkdir($this->cacheDir, 0777, true);
         }
-        $url = strtok(rtrim($_SERVER['REQUEST_URI'], '/'), '?');
-        $url = str_replace(trim(self::assetUrl('/'), '/'), '', $url);
-        $this->url = $url;
+    }
+
+    /**
+     * Sets the cache configuration.
+     *
+     * @param array $config The cache configuration array.
+     */
+    public function cacheConfig(array $config){
+        $this->cacheConfig = $config;
     }
 
     /**
@@ -38,7 +39,7 @@ class Cache {
      * @param string $cacheKey The key to identify the cached content
      * @return string|false Cached HTML content or false if not available
      */
-    public function get(string $cacheKey) {
+    protected function getCache(string $cacheKey) {
         $cacheFile = $this->getCacheFilePath($cacheKey);
         if (file_exists($cacheFile)) {
             return file_get_contents($cacheFile);
@@ -53,7 +54,7 @@ class Cache {
      * @param string $htmlContent The HTML content to be cached
      * @return bool True if caching is successful, false otherwise
      */
-    public function set(string $cacheKey, string $htmlContent) {
+    protected function setCache(string $cacheKey, string $htmlContent) {
         $cacheFile = $this->getCacheFilePath($cacheKey);
         return file_put_contents($cacheFile, $htmlContent) !== false;
     }
@@ -66,5 +67,27 @@ class Cache {
      */
     private function getCacheFilePath(string $cacheKey) {
         return $this->cacheDir . md5($cacheKey) . '.cache';
+    }
+
+    protected function purgeAll(){
+        $cacheFiles = glob($this->cacheDir . '*.cache');
+        foreach ($cacheFiles as $cacheFile) {
+            if (file_exists($cacheFile)) {
+                unlink($cacheFile);
+            }
+        }
+    }
+
+    protected function purgeCache(string $cacheKey){
+        $cacheFile = $this->getCacheFilePath($cacheKey);
+        if (file_exists($cacheFile)) {
+            unlink($cacheFile);
+        }
+    }
+
+    protected function checkConfig(string $configKey){
+        if(isset($_GET[$this->cacheConfig[$configKey]]) && isset($this->cacheConfig[$configKey]) && $this->cacheConfig[$configKey] == $_GET[$this->cacheConfig[$configKey]]){
+            return true;
+        }
     }
 }

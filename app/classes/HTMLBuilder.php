@@ -12,13 +12,8 @@ namespace CML\Classes;
  * @author CallMeLeon <kontakt@callmeleon.de>
  * @see https://docs.callmeleon.de/cml#html-builder
  */
-abstract class HTMLBuilder {
+abstract class HTMLBuilder extends Cache{
     use Functions\Functions;
-
-    /**
-     * @var HTMLCache The HTML cache instance
-     */
-    private Cache $htmlCache;
 
     const BEFORE_HEAD = 'before_head';
     const TOP_HEAD = 'top_head';
@@ -642,15 +637,6 @@ abstract class HTMLBuilder {
      */
     protected function buildHTML(){
 
-        $this->htmlCache = new Cache(CACHE_PATH);
-
-        $cacheKey = $this->htmlCache->url;
-
-        if (PRODUCTION && $this->htmlCache->get($cacheKey)) {
-            echo $this->htmlCache->get($cacheKey);
-            exit;
-        }
-
         $attrHTML = $this->_arrToHtmlAttrs($this->htmlAttr);
         $attrBody = $this->_arrToHtmlAttrs($this->bodyAttr);
         ob_start();
@@ -684,7 +670,6 @@ abstract class HTMLBuilder {
         <?= PHP_EOL.'</html>'; ?>
         <?php
         echo $output = $this->minifyHTML(preg_replace('/\h+(?=<)/', ' ', ob_get_clean()));
-        $this->htmlCache->set($cacheKey, $output);
         exit;
     }
 
