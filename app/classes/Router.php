@@ -447,6 +447,9 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param array $routes Routes with the appropriate action
      */
     protected function _processRoutes(string $url, array $routes) {
+        // Sort the routes by the number of parameters in descending order
+        uksort($routes, fn($key1, $key2) => (strpos($key1, ':') !== false ? 1 : 0) - (strpos($key2, ':') !== false ? 1 : 0));
+
         foreach ($routes as $routeUrl => $routeData) {
             // Check if the current route is restricted to AJAX requests
             if ($routeData['ajaxOnly'] && !$this->isAjaxRequest()) {
