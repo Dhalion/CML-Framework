@@ -30,11 +30,6 @@ abstract class HTMLBuilder extends Cache{
     private bool $minifyHTML = false;
 
     /**
-     * @var string The output content of the HTMLBuilder class.
-     */
-    protected string $outputContent = "";
-
-    /**
      * @var string The URL for AJAX requests.
      */
     private string $ajaxUrl = "";
@@ -637,7 +632,6 @@ abstract class HTMLBuilder extends Cache{
      */
     protected function buildHTML(string $outputContent = ""){
         
-        $this->outputContent = $outputContent;
         $attrHTML = $this->_arrToHtmlAttrs($this->htmlAttr);
         $attrBody = $this->_arrToHtmlAttrs($this->bodyAttr);
 
@@ -664,7 +658,7 @@ abstract class HTMLBuilder extends Cache{
         <?= "<body{$attrBody}>"; ?>
         <?= $this->_getHookContent(self::TOP_BODY); ?>
         <?= $this->header; ?>
-        <?= $this->minifyHTML($this->outputContent)?> 
+        <?= $this->minifyHTML($outputContent)?> 
         <?= $this->_getHookContent(self::BEFORE_BODY); ?>
         <?= $this->footer; ?>
         <?= PHP_EOL.'</body>'; ?>
