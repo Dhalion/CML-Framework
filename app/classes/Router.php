@@ -135,22 +135,8 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @return bool
      */
     public function isApi():bool{
-        header('Content-Type: application/json');
+        self::setHeader('Content-Type', 'application/json');
         return $this->isApi = true;
-    }
-
-    /**
-     * Set a custom HTTP header.
-     *
-     * @param string $name The name of the header
-     * @param string $value The value of the header
-     */
-    public function setHeader(string $name, string $value = '') {
-        if ($value === '') {
-            header($name);
-        } else {
-            header("$name: $value");
-        }
     }
 
     /**
@@ -198,7 +184,7 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param string $method The HTTP method (e.g., "GET" or "POST")
      */
     private function handleRouteNotFound(string $url, string $method) {
-        header("HTTP/1.1 404 Not Found");
+        self::setHeader("HTTP/1.1 404 Not Found");
         trigger_error("Route not found for URL: '$url' (Method: $method)", E_USER_ERROR);
     }
 
@@ -440,7 +426,7 @@ class Router extends \CML\Classes\HTMLBuilder{
         // Redirect to the specified URL if the route is not found and a redirect URL is set
         if (!isset($this->routes[$method][$url]) || $process === false) {
             if (!empty($this->redirectUrl)) {
-                header("Location: " . $this->redirectUrl);
+                self::setHeader("Location", $this->redirectUrl);
                 die;
             } elseif (isset($this->errorPage['page'])) {
                 $this->setTitle($this->errorPage['title']);

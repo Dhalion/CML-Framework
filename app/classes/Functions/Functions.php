@@ -29,10 +29,24 @@ trait Functions{
         global $cml_namedRoutes;
         if (isset($cml_namedRoutes[$name])) {
             $url = $this->assetUrl($cml_namedRoutes[$name]);
-            header("Location: $url");
+            self::setHeader("Location", $url);
             exit;
         } else {
             trigger_error("Route with name '$name' not found.", E_USER_ERROR);
+        }
+    }
+
+    /**
+     * Set a custom HTTP header.
+     *
+     * @param string $name The name of the header
+     * @param string $value The value of the header
+     */
+    public static function setHeader(string $name, string $value = '') {
+        if ($value === '') {
+            header($name);
+        } else {
+            header("$name: $value");
         }
     }
 
