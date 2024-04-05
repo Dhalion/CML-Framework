@@ -140,6 +140,16 @@ class Router extends \CML\Classes\HTMLBuilder{
     }
 
     /**
+     * Set a custom HTTP header.
+     *
+     * @param string $name The name of the header
+     * @param string $value The value of the header
+     */
+    public function setHeader(string $name, string $value) {
+        header("$name: $value");
+    }
+
+    /**
      * Get all defined routes.
      *
      * @return array An array containing all defined routes.
