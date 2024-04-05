@@ -152,6 +152,7 @@ class Router extends \CML\Classes\HTMLBuilder{
                     'method' => $method, 
                     'url' => $url, 
                     'name' => $route['name'],
+                    'meta' => $this->meta(null, $url),
                 ];
             }
         }
