@@ -301,19 +301,23 @@ class Router extends \CML\Classes\HTMLBuilder{
     }
 
     /**
-     * Retrieves the metadata for all routes.
+     * Retrieves the metadata for all routes or a specific route URL.
      *
-     * @return array The metadata for all routes.
+     * @param string|null $url The URL of the specific route to retrieve metadata for. If null, retrieves metadata for all routes.
+     * @return null|array The metadata for the routes. The keys are the route URLs and the values are the corresponding metadata.
      */
-    public function allMetas() {
+    public function allMetas(string $url = null): ?array {
         $metadata = [];
-        $routes = $this->getAllRoutes();
-
-        foreach ($routes as $data) {
-            $url = $data["url"];
+    
+        if ($url) {
             $metadata[$url] = $this->meta(null, $url);
+        } else {
+            $routes = $this->getAllRoutes();
+            foreach ($routes as $data) {
+                $metadata[$data["url"]] = $this->meta(null, $data["url"]);
+            }
         }
-
+    
         return $metadata;
     }
 
