@@ -37,16 +37,26 @@ trait Functions{
     }
 
     /**
-     * Set a custom HTTP header.
+     * Set custom HTTP headers.
      *
-     * @param string $name The name of the header
-     * @param string $value The value of the header
+     * @param string|array $name The name of the header or an array of headers
+     * @param string $value The value of the header (optional)
      */
-    public static function setHeader(string $name, string $value = '') {
-        if ($value === '') {
-            header($name);
+    public static function setHeader($name, string $value = '') {
+        if (is_array($name)) {
+            foreach ($name as $headerName => $headerValue) {
+                if ($headerValue === '') {
+                    header($headerName);
+                } else {
+                    header("$headerName: $headerValue");
+                }
+            }
         } else {
-            header("$name: $value");
+            if ($value === '') {
+                header($name);
+            } else {
+                header("$name: $value");
+            }
         }
     }
 
