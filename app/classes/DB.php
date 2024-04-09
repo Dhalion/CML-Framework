@@ -262,6 +262,97 @@ class DB {
         }
     }
 
+
+    /**
+     * Creates a database dump and saves it to a file.
+     *
+     * @param string $dumpFile The path to the dump file.
+     * @param array $tablesFilter An optional array of table names to filter. Only tables not in this array will be included in the dump.
+     * @param bool $insertData Whether to include table data in the dump.
+     * @param bool $onlyInserts Whether to include only INSERT statements in the dump.
+     * @param bool $dropTables Whether to include DROP TABLE statements in the dump.
+     * @return bool Returns true if the dump was created successfully, false otherwise.
+     */
+    public function createDatabaseDump(string $dumpFile, array $tablesFilter = [], bool $insertData = true, bool $onlyInserts = false, bool $dropTables = true): bool {
+        if (!$this->connected) {
+            trigger_error("No database connection established.", E_USER_WARNING);
+            return false;
+        }
+
+        // Open dump file
+        $fp = fopen($dumpFile, 'w');
+        if (!$fp) {
+            trigger_error("Failed to open dump file.", E_USER_WARNING);
+            return false;
+        }
+
+        // Get database name
+        $database = $this->conn->real_escape_string($this->conn->query("SELECT DATABASE()")->fetch_row()[0]);
+        if(empty($database)){
+            trigger_error("No database selected.", E_USER_WARNING);
+            return false;
+        }
+
+        // Write general information to dump file
+        fwrite($fp, "-- Database dump for database: $database --\n");
+        fwrite($fp, "-- Created on: " . date('Y-m-d H:i:s') . " --\n\n");
+
+        // Get all tables from database
+        $tables = [];
+        $sql = "SHOW TABLES";
+        $result = $this->conn->query($sql);
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $tableName = $row['Tables_in_' . $database];
+                if (!in_array($tableName, $tablesFilter)) {
+                    $tables[] = $tableName;
+                }
+            }
+        }
+        
+        // If desired, drop existing tables
+        if ($dropTables) {
+            foreach ($tables as $table) {
+                fwrite($fp, "DROP TABLE IF EXISTS `$table`;\n");
+            }
+            fwrite($fp, "\n");
+        }
+
+        // Write table structure and data to dump file
+        foreach ($tables as $table) {
+            
+            if(!$onlyInserts){
+                $sql = "SHOW CREATE TABLE $table";
+                $result = $this->conn->query($sql);
+                $row = $result->fetch_assoc();
+                fwrite($fp, "/* Table structure for table `$table` */\n\n");
+                fwrite($fp, $row['Create Table'] . ";\n\n");
+            }
+
+            if ($insertData) {
+                $sql = "SELECT * FROM $table";
+                $result = $this->conn->query($sql);
+                if ($result->num_rows > 0) {
+                    fwrite($fp, "/* Data for table `$table` */\n\n");
+                    while ($row = $result->fetch_assoc()) {
+                        $insert = "INSERT INTO `$table` VALUES (";
+                        foreach ($row as $field) {
+                            $insert .= "'" . $this->conn->real_escape_string($field) . "',";
+                        }
+                        // Remove trailing comma
+                        $insert = rtrim($insert, ',');
+                        $insert .= ");\n";
+                        fwrite($fp, $insert);
+                    }
+                    fwrite($fp, "\n");
+                }
+            }
+        }
+
+        fclose($fp);
+        return true;
+    }
+
     /**
      * Helper function for bind_param.
      *
