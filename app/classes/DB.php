@@ -267,13 +267,12 @@ class DB {
      * Creates a database dump and saves it to a file.
      *
      * @param string $dumpFile The path to the dump file.
-     * @param array $tablesFilter An optional array of table names to filter. Only tables not in this array will be included in the dump.
      * @param bool $insertData Whether to include table data in the dump.
      * @param bool $onlyInserts Whether to include only INSERT statements in the dump.
      * @param bool $dropTables Whether to include DROP TABLE statements in the dump.
      * @return bool Returns true if the dump was created successfully, false otherwise.
      */
-    public function createDatabaseDump(string $dumpFile, array $tablesFilter = [], bool $insertData = true, bool $onlyInserts = false, bool $dropTables = true): bool {
+    public function createDatabaseDump(string $dumpFile, bool $insertData = true, bool $onlyInserts = false, bool $dropTables = true): bool {
         if (!$this->connected) {
             trigger_error("No database connection established.", E_USER_WARNING);
             return false;
@@ -304,9 +303,7 @@ class DB {
         if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
                 $tableName = $row['Tables_in_' . $database];
-                if (!in_array($tableName, $tablesFilter)) {
-                    $tables[] = $tableName;
-                }
+                $tables[] = $tableName;
             }
         }
         
