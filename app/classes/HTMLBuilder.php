@@ -75,6 +75,11 @@ abstract class HTMLBuilder extends Cache{
     private string $charsetAttr = "UTF-8";
 
     /**
+     * @var string Stores the currently url.
+     */
+    public string $currentUrl;
+
+    /**
      * @var array The attributes for the body tag.
      */
     private array $bodyAttr = [];
@@ -628,9 +633,26 @@ abstract class HTMLBuilder extends Cache{
     }
 
     /**
+     * Checks if the cache is enabled and retrieves the cached content if available.
+     *
+     * @param string $cacheKey The key used to identify the cached content.
+     */
+    public function checkCache(string $cacheKey){
+        if($this->cacheEnabled === true){
+            $cachedContent = $this->getCache($cacheKey);
+            if ($cachedContent !== false && PRODUCTION !== true) {
+                echo $cachedContent;
+                exit;
+            }
+        }
+    }
+
+    /**
      * Builds the complete HTML structure.
      */
     protected function buildHTML(string $outputContent = ""){
+        $cacheKey = $this->currentUrl;
+        $this->checkCache($cacheKey);
         
         $attrHTML = $this->_arrToHtmlAttrs($this->htmlAttr);
         $attrBody = $this->_arrToHtmlAttrs($this->bodyAttr);
@@ -665,7 +687,13 @@ abstract class HTMLBuilder extends Cache{
         <?= $this->_getHookContent(self::AFTER_BODY); ?>
         <?= PHP_EOL.'</html>'; ?>
         <?php
-        echo $output = $this->minifyHTML(preg_replace('/\h+(?=<)/', ' ', ob_get_clean()));
+        $htmlContent = $this->minifyHTML(preg_replace('/\h+(?=<)/', ' ', ob_get_clean()));
+        
+        if($this->cacheEnabled === true){
+            $this->setCache($cacheKey, $htmlContent);
+        }
+
+        echo $htmlContent;
         exit;
     }
 

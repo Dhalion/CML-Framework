@@ -30,6 +30,13 @@ class Router extends \CML\Classes\HTMLBuilder{
     public string $currentRoute = '';
 
     /**
+     * Stores the currently url.
+     *
+     * @var string
+     */
+    public string $currentUrl = '';
+
+    /**
      * Stores the current HTTP request method.
      *
      * @var string
@@ -410,6 +417,20 @@ class Router extends \CML\Classes\HTMLBuilder{
         $url = str_replace(ltrim(rtrim(parent::assetUrl(""), "/"), "/"), "", $url); // Add the basename of the application folder
         if ($url == "/index.php") { $url = "/";} // Check if the URL is "index.php" and redirect to the root route
         $url = str_replace("//", "/", $url); // Remove double slashes from the URL
+        $this->currentUrl = $url;
+
+        // Clear current site cache and preload ist
+        if($this->cacheEnabled && isset($_GET[$this->cacheOptions['config']['clearCurrent']])) {
+            $this->purgeCache($url);
+        }
+
+        // Clear all cache
+        if($this->cacheEnabled && isset($_GET[$this->cacheOptions['config']['clearAll']])) {
+            $this->purgeAll();
+        }
+
+        // Check for cache and load it
+        $this->checkCache($this->currentUrl);
 
         $method = $_SERVER['REQUEST_METHOD']; // Indicates the client's HTTP request method (e.g., GET, POST, etc.)
 

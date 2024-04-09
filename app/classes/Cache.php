@@ -10,27 +10,39 @@ namespace CML\Classes;
 abstract class Cache {
     use Functions\Functions;
 
+    public bool $cacheEnabled = false;
+
     /**
      * Cache directory path
      */
     private string $cacheDir;
 
-    protected array $cacheConfig = array();
+    public array $cacheOptions;
 
-    public function initCache() {
-        $this->cacheDir = self::getRootPath(CACHE_PATH);
-        if (!file_exists($this->cacheDir)) {
-            mkdir($this->cacheDir, 0777, true);
+    /**
+     * Enables or disables caching and sets the cache options.
+     *
+     * @param bool $cacheEnabled Whether caching is enabled or not.
+     * @param string $clearCurrentQuery The query to clear the current cache.
+     * @param string $clearAllQuery The query to clear all cache.
+     */
+    public function cache(bool $cacheEnabled = false, string $clearCurrentQuery, string $clearAllQuery) {
+        $this->cacheEnabled = $cacheEnabled;
+        if($this->cacheEnabled){
+            $this->initCache();
+            $this->cacheOptions['config']['clearCurrent'] = $clearCurrentQuery;
+            $this->cacheOptions['config']['clearAll'] = $clearAllQuery;
         }
     }
 
     /**
-     * Sets the cache configuration.
-     *
-     * @param array $config The cache configuration array.
+     * Initializes the cache directory.
      */
-    public function cacheConfig(array $config){
-        $this->cacheConfig = $config;
+    private function initCache() {
+        $this->cacheDir = self::getRootPath(CACHE_PATH);
+        if (!file_exists($this->cacheDir)) {
+            mkdir($this->cacheDir, 0777, true);
+        }
     }
 
     /**
@@ -66,9 +78,12 @@ abstract class Cache {
      * @return string The cache file path
      */
     private function getCacheFilePath(string $cacheKey) {
-        return $this->cacheDir . md5($cacheKey) . '.cache';
+        return $this->cacheDir . base64_encode($cacheKey) . '.cache';
     }
 
+    /**
+     * Purges all cache files in the cache directory.
+     */
     protected function purgeAll(){
         $cacheFiles = glob($this->cacheDir . '*.cache');
         foreach ($cacheFiles as $cacheFile) {
@@ -78,16 +93,15 @@ abstract class Cache {
         }
     }
 
+    /**
+     * Purges the cache file associated with the given cache key.
+     *
+     * @param string $cacheKey The cache key.
+     */
     protected function purgeCache(string $cacheKey){
         $cacheFile = $this->getCacheFilePath($cacheKey);
         if (file_exists($cacheFile)) {
             unlink($cacheFile);
-        }
-    }
-
-    protected function checkConfig(string $configKey){
-        if(isset($_GET[$this->cacheConfig[$configKey]]) && isset($this->cacheConfig[$configKey]) && $this->cacheConfig[$configKey] == $_GET[$this->cacheConfig[$configKey]]){
-            return true;
         }
     }
 }
