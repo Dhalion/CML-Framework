@@ -25,6 +25,17 @@ switch ($command) {
         createController($controllerName, $useDatabase);
         break;
 
+    case 'create:dump':
+        $noInsert = isset($options['--no-insert']);
+        $onlyInserts = isset($options['--only-insert']);
+        $noDrop = isset($options['--no-drop']);
+
+        $fileName = array_shift($argv) ?? "SQL_DUMP_".date('Y-m-d_H:i:s').".sql";
+
+        $db = new CML\Classes\DB();
+        $db->createDatabaseDump($fileName, !$noInsert, $onlyInserts, !$noDrop);
+        break;
+
     case 'cml:version':
         version();
         break;
