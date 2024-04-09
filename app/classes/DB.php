@@ -308,7 +308,7 @@ class DB {
         }
         
         // If desired, drop existing tables
-        if ($dropTables) {
+        if ($dropTables && !$onlyInserts) {
             foreach ($tables as $table) {
                 fwrite($fp, "DROP TABLE IF EXISTS `$table`;\n");
             }
