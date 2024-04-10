@@ -22,11 +22,11 @@ abstract class Cache {
     /**
      * Enables or disables caching and sets the cache options.
      *
-     * @param bool $cacheEnabled Whether caching is enabled or not.
      * @param string $clearCurrentQuery The query to clear the current cache.
      * @param string $clearAllQuery The query to clear all cache.
+     * @param bool $cacheEnabled Whether caching is enabled or not.
      */
-    public function cache(bool $cacheEnabled = false, string $clearCurrentQuery, string $clearAllQuery) {
+    public function cache(string $clearCurrentQuery, string $clearAllQuery, bool $cacheEnabled = false) {
         $this->cacheEnabled = $cacheEnabled;
         if($this->cacheEnabled){
             $this->initCache();
