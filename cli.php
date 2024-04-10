@@ -50,8 +50,13 @@ switch ($command) {
         }
         break;
 
+    case 'help':
+        help();
+        break;
+
     default:
         echo "Unknown command\n";
+        help();
         break;
 }
 
@@ -178,4 +183,23 @@ function checkUpdate($checkUpdate){
             echo "CML Framework {$remoteVerions} is available. Your Version: {$localVersion}\n";
         }
     }
+}
+
+function help(){
+    echo "Usage: php cli.php [command] [options]\n\n";
+    echo "Available commands:\n";
+    echo "  help \t\t\t\t\t\t\t\t\tShows CML Framework command list\n";
+    echo "  create:controller [ControllerName] [--db|--database]\t\t\tCreate a new controller\n";
+    echo "  create:dump [FileName] [--no-insert] [--only-insert] [--no-drop]\tCreate a database dump\n";
+    echo "  cml:version\t\t\t\t\t\t\t\tShow CML Framework version\n";
+    echo "  cml:update [--check]\t\t\t\t\t\t\tUpdate CML Framework\n";
+
+    echo "\nOptions:\n";
+    echo "  --db, --database\t\t\t\t\t\t\tGenerate controller with database code\n";
+    echo "  --no-insert\t\t\t\t\t\t\t\tExclude INSERT statements from database dump\n";
+    echo "  --only-insert\t\t\t\t\t\t\t\tOnly include INSERT statements in database dump\n";
+    echo "  --no-drop\t\t\t\t\t\t\t\tExclude DROP TABLE statements from database dump\n";
+    echo "  --check\t\t\t\t\t\t\t\tCheck for available updates\n";
+    echo "\nExample:\n";
+    echo "  php cli.php create:controller TestController --db\n";
 }
