@@ -293,8 +293,15 @@ class DB {
         }
 
         // Write general information to dump file
-        fwrite($fp, "-- Database dump for database: $database --\n");
-        fwrite($fp, "-- Created on: " . date('Y-m-d H:i:s') . " --\n\n");
+        $output =   "-- Database dump for database: $database --\n".
+                    "-- Created on: " . date('Y-m-d H:i:s') . " --\n\n";
+        fwrite($fp, $output);
+
+        if (php_sapi_name() == 'cli') {
+            echo "\033[2J"; // clear screen
+            echo "\033[0;0H"; // set cursors to the beginning
+            echo $output;
+        }
 
         // Get all tables from database
         $tables = [];
@@ -304,6 +311,9 @@ class DB {
             while ($row = $result->fetch_assoc()) {
                 $tableName = $row['Tables_in_' . $database];
                 $tables[] = $tableName;
+                if (php_sapi_name() == 'cli') {
+                    echo "Saving table: $tableName\n";
+                }
             }
         }
         
@@ -316,8 +326,11 @@ class DB {
         }
 
         // Write table structure and data to dump file
-        foreach ($tables as $table) {
-            
+        $count = count($tables) - 1;
+        foreach ($tables as $i => $table) {
+            if (php_sapi_name() == 'cli') {
+                showProgress($i, $count);
+            }
             if(!$onlyInserts){
                 $sql = "SHOW CREATE TABLE $table";
                 $result = $this->conn->query($sql);
@@ -334,7 +347,7 @@ class DB {
                     while ($row = $result->fetch_assoc()) {
                         $insert = "INSERT INTO `$table` VALUES (";
                         foreach ($row as $field) {
-                            $insert .= "'" . $this->conn->real_escape_string($field) . "',";
+                            $insert .= "'" . ($field !== null ? $this->conn->real_escape_string($field) : 'NULL') . "',";
                         }
                         // Remove trailing comma
                         $insert = rtrim($insert, ',');

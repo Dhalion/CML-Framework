@@ -203,3 +203,11 @@ function help(){
     echo "\nExample:\n";
     echo "  php cli.php create:controller TestController --db\n";
 }
+
+function showProgress($currentIteration, $totalIterations) {
+    $percentage = round(($currentIteration / $totalIterations) * 100);
+    $barLength = 20;
+    $barFill = round($percentage / 100 * $barLength);
+    $barEmpty = $barLength - $barFill;
+    echo "\r[" . str_repeat("=", $barFill) . str_repeat(" ", $barEmpty) . "] {$percentage}%   ";
+}
