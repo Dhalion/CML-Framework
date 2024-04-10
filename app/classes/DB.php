@@ -359,6 +359,9 @@ class DB {
             }
         }
 
+        if (php_sapi_name() == 'cli') {
+            echo "\n\nSQL Dump finished! Saved {$dumpFile}\n";
+        }
         fclose($fp);
         return true;
     }
