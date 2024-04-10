@@ -347,7 +347,7 @@ class DB {
                     while ($row = $result->fetch_assoc()) {
                         $insert = "INSERT INTO `$table` VALUES (";
                         foreach ($row as $field) {
-                            $insert .= "`" . ($field !== null ? $this->conn->real_escape_string($field) : 'NULL') . "`,";
+                            $insert .= "'" . ($field !== null ? $this->conn->real_escape_string($field) : 'NULL') . "',";
                         }
                         // Remove trailing comma
                         $insert = rtrim($insert, ',');
