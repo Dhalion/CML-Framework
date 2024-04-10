@@ -332,7 +332,7 @@ class DB {
                 showProgress($i, $count);
             }
             if(!$onlyInserts){
-                $sql = "SHOW CREATE TABLE $table";
+                $sql = "SHOW CREATE TABLE `$table`";
                 $result = $this->conn->query($sql);
                 $row = $result->fetch_assoc();
                 fwrite($fp, "/* Table structure for table `$table` */\n\n");
@@ -340,14 +340,14 @@ class DB {
             }
 
             if ($insertData) {
-                $sql = "SELECT * FROM $table";
+                $sql = "SELECT * FROM `$table`";
                 $result = $this->conn->query($sql);
                 if ($result->num_rows > 0) {
                     fwrite($fp, "/* Data for table `$table` */\n\n");
                     while ($row = $result->fetch_assoc()) {
                         $insert = "INSERT INTO `$table` VALUES (";
                         foreach ($row as $field) {
-                            $insert .= "'" . ($field !== null ? $this->conn->real_escape_string($field) : 'NULL') . "',";
+                            $insert .= "`" . ($field !== null ? $this->conn->real_escape_string($field) : 'NULL') . "`,";
                         }
                         // Remove trailing comma
                         $insert = rtrim($insert, ',');
