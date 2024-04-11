@@ -5,6 +5,9 @@ if (php_sapi_name() !== 'cli') {
     die("This script can only be executed via the command line (CLI).\n");
 }
 
+// The constant 'CLI' is used to indicate that the script is being executed in a command-line interface (CLI) environment.
+define('CLI', true);
+
 // Include cml-load.php file
 error_reporting(E_ALL & ~E_NOTICE);
 include_once 'app/admin/cml-load.php';
@@ -52,6 +55,10 @@ switch ($command) {
 
     case 'help':
         help();
+        break;
+
+    case 'do:action':
+        do_action($argv);
         break;
 
     default:
@@ -185,6 +192,21 @@ function checkUpdate($checkUpdate){
     }
 }
 
+function do_action($options){
+    if(!isset($options[0])){
+        echo "No action provided.\n";
+        return;
+    }
+    $action = $options[0];
+    unset($options[0]);
+    try {
+        call_user_func_array($action, $options);
+        echo "\nAction: $action Called successfully!\n";
+    } catch (\Throwable $th) {
+        echo $th;
+    }
+}
+
 function help(){
     echo "Usage: php cli.php [command] [options]\n\n";
     echo "Available commands:\n";
@@ -193,6 +215,7 @@ function help(){
     echo "  create:dump [FileName] [--no-insert] [--only-insert] [--no-drop]\tCreate a database dump\n";
     echo "  cml:version\t\t\t\t\t\t\t\tShow CML Framework version\n";
     echo "  cml:update [--check]\t\t\t\t\t\t\tUpdate CML Framework\n";
+    echo "  do:action [function name] [...params]\t\t\t\t\tCall a function from the functions.php\n";
 
     echo "\nOptions:\n";
     echo "  --db, --database\t\t\t\t\t\t\tGenerate controller with database code\n";
