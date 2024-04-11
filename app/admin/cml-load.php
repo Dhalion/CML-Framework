@@ -30,17 +30,16 @@
     }
 
     /**
-     * Loads functions from functions.php
-     */
-    if (file_exists($functions = dirname(__DIR__, 2).'/functions.php')){
-        require_once $functions;
-    }
-
-    /**
      * Loads framework functions from cml-functions.php
      */
     if (file_exists($cml_functions = __DIR__.'/cml-functions.php')){
         require_once $cml_functions;
     }
 
+    /**
+     * Loads functions from functions.php
+     */
+    if (file_exists($functions = dirname(__DIR__, 2).'/functions.php')){
+        require_once $functions;
+    }
 ?>
