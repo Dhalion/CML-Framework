@@ -23,44 +23,24 @@
     }
 
     /**
-     * Executes a function from the CML\Classes\Functions namespace using the provided function name and parameters.
-     *
-     * @param string $functionName The name of the function to execute.
-     * @param mixed  ...$parameters The parameters to pass to the function.
-     * @return mixed The result of the executed function.
-     */
-    function useTrait(string $functionName, ...$parameters) {
-        $class = new class {
-            use CML\Classes\Functions\Functions;
-            use CML\Classes\Functions\Session;
-        };
-        return $class->$functionName(...$parameters);
-    }
-
-    /**
      * Loads error handler from cml-error.php
      */
     if (file_exists($handler = __DIR__.'/cml-error.php')){
         require_once $handler;
     }
 
+    /**
+     * Loads functions from functions.php
+     */
     if (file_exists($functions = dirname(__DIR__, 2).'/functions.php')){
-        $cml_ajax_functions = array();
-        /**
-         * Adds a function to the list of AJAX functions.
-         *
-         * This function allows you to register one or more functions to be called via AJAX.
-         * The registered functions will be stored in the global variable $cml_ajax_functions.
-         */
-        function ajax(...$function) {
-            global $cml_ajax_functions;
-            $cml_ajax_functions = array_merge($cml_ajax_functions, $function);
-        }
-
-        /**
-         * Loads functions from functions.php
-         */
         require_once $functions;
+    }
+
+    /**
+     * Loads framework functions from cml-functions.php
+     */
+    if (file_exists($cml_functions = __DIR__.'/cml-functions.php')){
+        require_once $cml_functions;
     }
 
 ?>
