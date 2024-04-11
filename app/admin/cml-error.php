@@ -50,7 +50,7 @@
             error_log("[ID: {$id}] ", 3, $errorfile);
         }
 
-        if(IS_AJAX){
+        if(IS_AJAX || CLI){
             http_response_code(500);
             useTrait('startSession');
             echo json_encode(
@@ -73,10 +73,9 @@
                         'env' => $_ENV, 
                         'cookie' => $_COOKIE, 
                         'http-status' => http_response_code(), 
-                        'headers' => getallheaders()
                     ]
                 ]]
-            );
+            , JSON_PRETTY_PRINT);
             exit;
         }
         
