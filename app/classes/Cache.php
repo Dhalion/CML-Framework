@@ -104,4 +104,97 @@ abstract class Cache {
             unlink($cacheFile);
         }
     }
+
+    /**
+     * Sets cache data with a given name, value, and expiration time.
+     *
+     * @param string $name The name of the cache data.
+     * @param mixed $value The value of the cache data.
+     * @param int $expiration The expiration time of the cache data in seconds.
+     * @return bool Returns true if the cache data was successfully set, false otherwise.
+     */
+    public function set_cache_data(string $name, $value, int $expiration): bool {
+        $transient_directory = self::getRootPath('cache/transient/');
+        if (!is_dir($transient_directory)) {
+            mkdir($transient_directory, 0755, true); 
+        }
+        
+        $transient_file = $transient_directory . 'transients.temp'; 
+        $transients = array();
+        
+        if (file_exists($transient_file)) {
+            $data = file_get_contents($transient_file);
+            $transients = unserialize($data);
+        }
+        
+        $transients[$name] = array(
+            'value' => $value,
+            'expiration' => time() + $expiration
+        );
+        
+        $data = serialize($transients);
+        file_put_contents($transient_file, $data);
+        
+        return true;
+    }
+
+    /**
+     * Retrieves data from the cache based on the given name.
+     *
+     * @param string $name The name of the cache data to retrieve.
+     * @return mixed|false The value of the cache data if found and not expired, false otherwise.
+     */
+    public function get_cache_data(string $name) {
+        $transient_directory = self::getRootPath('cache/transient/');
+        $transient_file = $transient_directory . 'transients.temp';
+        
+        if (!file_exists($transient_file)) {
+            return false;
+        }
+        
+        $data = file_get_contents($transient_file);
+        $transients = unserialize($data);
+        
+        if (!isset($transients[$name])) {
+            return false;
+        }
+        
+        $transient = $transients[$name];
+        
+        if (isset($transient['expiration']) && $transient['expiration'] < time()) {
+            unset($transients[$name]);
+            $data = serialize($transients);
+            file_put_contents($transient_file, $data);
+            return false;
+        }
+        
+        return $transient['value']; 
+    }
+
+    /**
+     * Deletes a specific cache data by name.
+     *
+     * @param string $name The name of the cache data to delete.
+     * @return bool Returns true if the cache data was successfully deleted, false otherwise.
+     */
+    public function delete_cache_data(string $name): bool {
+        $transient_directory = self::getRootPath('cache/transient/');
+        $transient_file = $transient_directory . 'transients.temp';
+        
+        if (!file_exists($transient_file)) {
+            return false;
+        }
+        
+        $data = file_get_contents($transient_file);
+        $transients = unserialize($data);
+        
+        if (isset($transients[$name])) {
+            unset($transients[$name]);
+            $data = serialize($transients);
+            file_put_contents($transient_file, $data);
+            return true;
+        }
+
+        return false;
+    }
 }
