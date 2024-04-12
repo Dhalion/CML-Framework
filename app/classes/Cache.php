@@ -113,7 +113,7 @@ abstract class Cache {
      * @param int $expiration The expiration time of the cache data in seconds.
      * @return bool Returns true if the cache data was successfully set, false otherwise.
      */
-    public function set_cache_data(string $name, $value, int $expiration): bool {
+    public function setCacheData(string $name, $value, int $expiration): bool {
         $transient_directory = self::getRootPath('cache/transient/');
         if (!is_dir($transient_directory)) {
             mkdir($transient_directory, 0755, true); 
@@ -144,7 +144,7 @@ abstract class Cache {
      * @param string $name The name of the cache data to retrieve.
      * @return mixed|false The value of the cache data if found and not expired, false otherwise.
      */
-    public function get_cache_data(string $name) {
+    public function getCacheData(string $name) {
         $transient_directory = self::getRootPath('cache/transient/');
         $transient_file = $transient_directory . 'transients.temp';
         
@@ -177,7 +177,7 @@ abstract class Cache {
      * @param string $name The name of the cache data to delete.
      * @return bool Returns true if the cache data was successfully deleted, false otherwise.
      */
-    public function delete_cache_data(string $name): bool {
+    public function deleteCacheData(string $name): bool {
         $transient_directory = self::getRootPath('cache/transient/');
         $transient_file = $transient_directory . 'transients.temp';
         
