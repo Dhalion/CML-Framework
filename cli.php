@@ -53,6 +53,10 @@ switch ($command) {
         }
         break;
 
+    case 'cml:component':
+        downloadComponent($argv);
+        break;
+
     case 'help':
         help();
         break;
@@ -207,6 +211,38 @@ function do_action($options){
     }
 }
 
+function downloadComponent($options){
+    if(!isset($options[0])){
+        echo "No component provided.\n";
+        echo "cml:component [component_name]\n";
+        return;
+    }
+
+    $path = useTrait('getRootPath', COMPONENTS_PATH);
+    $url = 'https://docs.callmeleon.de/download/'.$options[0];
+
+    $filename = $options[0].'.cml.php';
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $response = curl_exec($ch);
+
+    if(empty($response)) {
+        echo 'This Component is not available: "'.$options[0].'"';
+    } else {
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        if($http_code == 200) {
+            $pfad = $path . $filename;
+            file_put_contents($pfad, $response);
+            echo 'Component download was successfully and saved in: ' . $pfad;
+        } else {
+            echo 'Error: (HTTP-Code ' . $http_code . ')';
+        }
+    }
+    curl_close($ch);
+}
+
 function help(){
     echo "Usage: php cli.php [command] [options]\n\n";
     echo "Available commands:\n";
@@ -215,6 +251,7 @@ function help(){
     echo "  create:dump [FileName] [--no-insert] [--only-insert] [--no-drop]\tCreate a database dump\n";
     echo "  cml:version\t\t\t\t\t\t\t\tShow CML Framework version\n";
     echo "  cml:update [--check]\t\t\t\t\t\t\tUpdate CML Framework\n";
+    echo "  cml:component [component name]\t\t\t\t\tDownload an official CML Framework Component\n";
     echo "  do:action [function name] [...params]\t\t\t\t\tCall a function from the functions.php\n";
 
     echo "\nOptions:\n";
