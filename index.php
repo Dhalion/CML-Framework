@@ -12,7 +12,6 @@ $app->activateMinifyHTML();
 $app->setErrorRedirect("/");
 $app->setFavicon("favicon.ico");
 $app->addMeta('name="theme-color" content="black"');
-$app->cache('clear', 'clearAll', true);
 
 //Global CDNs
 $app->addCDN("link", 'rel="preconnect" href="https://fonts.googleapis.com"');
