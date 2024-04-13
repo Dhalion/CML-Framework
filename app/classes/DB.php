@@ -103,8 +103,10 @@ class DB {
      * @return array The result of the SQL query as an array.
      */
     public function sql2array(string $query, array $params = []):array {
-        $sqlArray = array();
-    
+        if (!$this->connected) {
+            trigger_error("No database connected!", E_USER_ERROR);
+        }
+
         $stmt = $this->conn->prepare($query);
     
         if (!$stmt) {
@@ -138,6 +140,7 @@ class DB {
         
         $result = $stmt->get_result();
         if ($result) {
+            $sqlArray = [];
             while ($row = $result->fetch_assoc()) {
                 $cleanedRow = array_map(function($value) {
                     return ($value !== null) ? htmlspecialchars($value) : null;
@@ -203,6 +206,10 @@ class DB {
      * @param array $params Parameters for the SQL query (optional).
      */
     public function sql2db(string $query, array $params = []) {
+        if (!$this->connected) {
+            trigger_error("No database connected!", E_USER_ERROR);
+        }
+
         $stmt = $this->conn->prepare($query);
     
         if (!$stmt) {
@@ -232,8 +239,9 @@ class DB {
             call_user_func_array(array($stmt, 'bind_param'), $this->refValues($values));
         }
     
-        $stmt->execute();
+        $exec = $stmt->execute();
         $stmt->close();
+        return $exec;
     }
 
     /**
@@ -364,6 +372,65 @@ class DB {
         }
         fclose($fp);
         return true;
+    }
+
+    /**
+     * Checks if the 'cml_data' table exists in the database. If not, creates the table.
+     *
+     * @return bool Returns true if the table exists, false if it needs to be created.
+     */
+    protected function checkDataTable(){
+        $result = $this->sql2array("SHOW TABLES LIKE 'cml_data'");
+        if (!$result) {
+            $this->sql2db("CREATE TABLE `cml_data` (
+                `data_id` INT(11) NOT NULL AUTO_INCREMENT,
+                `data_name` VARCHAR(50) NULL DEFAULT NULL COLLATE 'utf8_general_ci',
+                `data_value` VARCHAR(1000) NULL DEFAULT NULL COLLATE 'utf8_general_ci',
+                `data_created` DATETIME NULL DEFAULT NULL,
+                `data_lastModify` DATETIME NULL DEFAULT NULL,
+                PRIMARY KEY (`data_id`) USING BTREE,
+                UNIQUE INDEX `data_name` (`data_name`) USING BTREE
+            )
+            COLLATE='utf8mb4_general_ci'
+            ENGINE=InnoDB;");
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Sets data in the database.
+     *
+     * @param string $name The name of the data.
+     * @param string $value The value of the data.
+     * @param bool $htmlspecialchars Whether to apply htmlspecialchars to the value or not.
+     */
+    public function setData(string $name, string $value, bool $htmlspecialchars = false) {
+        $this->checkDataTable();
+        $query = "INSERT INTO `cml_data` (`data_name`, `data_value`, `data_created`)
+                  VALUES ('$name', '$value', now())
+                  ON DUPLICATE KEY UPDATE `data_value` = " . ($htmlspecialchars ? '?' : "'$value'") . ", `data_lastModify` = now()";
+        $this->sql2db($query, $htmlspecialchars ? [$value] : []);
+    }
+
+    /**
+     * Retrieves data from the database based on the given name.
+     *
+     * @param string $name The name of the data to retrieve.
+     * @return mixed The value of the data if found, or false if not found.
+     */
+    public function getData(string $name){
+        $result = $this->sql2array("SELECT `data_value` FROM `cml_data` WHERE `data_name` = '$name'");
+        return $result[0]['data_value'] ?? false;
+    }
+
+    /**
+     * Deletes data from the database based on the given name.
+     *
+     * @param string $name The name of the data to be deleted.
+     */
+    public function deleteData(string $name){
+        $this->sql2db("DELETE FROM `cml_data` WHERE `data_name` = '$name'");
     }
 
     /**
