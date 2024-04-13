@@ -200,10 +200,11 @@ class DB {
     
 
     /**
-     * Executes an SQL query and performs the operations in the database.
+     * Executes a SQL query on the database and returns the number of affected rows.
      *
-     * @param string $query The SQL query.
-     * @param array $params Parameters for the SQL query (optional).
+     * @param string $query The SQL query to execute.
+     * @param array $params An optional array of parameters to bind to the query.
+     * @return int The number of affected rows.
      */
     public function sql2db(string $query, array $params = []) {
         if (!$this->connected) {
@@ -239,9 +240,10 @@ class DB {
             call_user_func_array(array($stmt, 'bind_param'), $this->refValues($values));
         }
     
-        $exec = $stmt->execute();
+        $stmt->execute();
+        $affectedRows = $stmt->affected_rows;
         $stmt->close();
-        return $exec;
+        return $affectedRows;
     }
 
     /**
@@ -430,7 +432,7 @@ class DB {
      * @param string $name The name of the data to be deleted.
      */
     public function deleteData(string $name){
-        $this->sql2db("DELETE FROM `cml_data` WHERE `data_name` = '$name'");
+        return $this->sql2db("DELETE FROM `cml_data` WHERE `data_name` = '$name'");
     }
 
     /**
