@@ -66,7 +66,7 @@ abstract class Cache {
      * @param string $htmlContent The HTML content to be cached
      * @return bool True if caching is successful, false otherwise
      */
-    protected function setCache(string $cacheKey, string $htmlContent) {
+    protected function setCache(string $cacheKey, string $htmlContent): bool {
         $cacheFile = $this->getCacheFilePath($cacheKey);
         return file_put_contents($cacheFile, $htmlContent) !== false;
     }
@@ -77,7 +77,7 @@ abstract class Cache {
      * @param string $cacheKey The cache key
      * @return string The cache file path
      */
-    private function getCacheFilePath(string $cacheKey) {
+    private function getCacheFilePath(string $cacheKey): string {
         return $this->cacheDir . base64_encode($cacheKey) . '.cache';
     }
 
