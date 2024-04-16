@@ -170,7 +170,7 @@ abstract class HTMLBuilder extends Cache{
      * @param array $variables Associative array of variables to be extracted and made available in the included file.
      */
     public function addHeader($header = '', array $variables = []) {
-        $this->_addContent(COMPONENTS_PATH.'header.php', $header, $this->header, $variables);
+        $this->_addContent(cml_config('COMPONENTS_PATH').'header.php', $header, $this->header, $variables);
     }
 
     /**
@@ -187,7 +187,7 @@ abstract class HTMLBuilder extends Cache{
      * @param array $variables Associative array of variables to be extracted and made available in the included file.
      */
     public function addFooter($footer = '', array $variables = []) {
-        $this->_addContent(COMPONENTS_PATH.'footer.php', $footer, $this->footer, $variables);
+        $this->_addContent(cml_config('COMPONENTS_PATH').'footer.php', $footer, $this->footer, $variables);
     }
 
     /**
@@ -412,7 +412,7 @@ abstract class HTMLBuilder extends Cache{
      */
     public function component(string $component, array $variables = []) {
         $component = str_replace(".php", '', $component).".php";
-        $path = self::getRootPath(COMPONENTS_PATH.$component);
+        $path = self::getRootPath(cml_config('COMPONENTS_PATH').$component);
         
         if (file_exists($path)) {
             extract($variables);
@@ -557,9 +557,9 @@ abstract class HTMLBuilder extends Cache{
         $fileExtension = pathinfo($path, PATHINFO_EXTENSION);
         
         if ($fileExtension === 'css') {
-            return self::_compressFile($path, STYLE_PATH ?? '', '.css');
+            return self::_compressFile($path, cml_config('STYLE_PATH') ?? '', '.css');
         } elseif ($fileExtension === 'js') {
-            return self::_compressFile($path, SCRIPT_PATH ?? '', '.js');
+            return self::_compressFile($path, cml_config('SCRIPT_PATH') ?? '', '.js');
         } else {
             return $path;
         }
@@ -640,7 +640,7 @@ abstract class HTMLBuilder extends Cache{
     public function checkCache(string $cacheKey){
         if($this->cacheEnabled === true){
             $cachedContent = $this->getCache($cacheKey);
-            if ($cachedContent !== false && PRODUCTION !== true) {
+            if ($cachedContent !== false && cml_config('PRODUCTION') !== true) {
                 echo $cachedContent;
                 exit;
             }
@@ -667,7 +667,7 @@ abstract class HTMLBuilder extends Cache{
             <meta charset="<?= $this->charsetAttr ?>">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <?php $this->_buildMetas(); ?>
-            <title><?= empty($this->title) ? APP_NAME : $this->title?></title>
+            <title><?= empty($this->title) ? cml_config('APP_NAME') : $this->title?></title>
             <?= !empty($this->ajaxUrl) ? "<script>let {$this->ajaxVar} = '{$this->ajaxUrl}'</script>" : ''?>
             <link rel="icon" type="image/x-icon" href="<?= self::url($this->favicon) ?>">
             <?php $this->_buildCdns(); ?>

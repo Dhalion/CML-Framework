@@ -34,16 +34,17 @@ class DB {
      *
      * @var string
      */
-    public string $sqlPath = SQL_PATH ?? '';
-    
+    public string $sqlPath = "";
+
     /**
      * Constructor of the DB class. Calls the methods to load environment variables and establish a connection to the database.
      */
     public function __construct(bool $autoconnect = true, bool $autoclose = false) {
+        $this->sqlPath = cml_config('SQL_PATH');
         $this->autoclose = $autoclose;
         if ($autoconnect) {
             $this->connected = true;
-            $this->connect(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME); 
+            $this->connect(cml_config('DB_HOST'), cml_config('DB_USER'), cml_config('DB_PASSWORD'), cml_config('DB_NAME')); 
         }
     }
 
@@ -66,7 +67,7 @@ class DB {
         if ($this->conn->connect_error) {
             trigger_error("Connection failed! ".$this->conn->connect_error, E_USER_ERROR);
         }
-        $this->conn->set_charset(DB_CHARSET);
+        $this->conn->set_charset(cml_config('DB_CHARSET'));
         $this->connected = true;
     }
 
@@ -92,7 +93,7 @@ class DB {
         if ($this->conn->ping()) {
             $this->close();
         }
-        $this->connect(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+        $this->connect(cml_config('DB_HOST'), cml_config('DB_USER'), cml_config('DB_PASSWORD'), cml_config('DB_NAME'));
     }
 
     /**

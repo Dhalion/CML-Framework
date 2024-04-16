@@ -8,18 +8,19 @@
      * In the production environment, errors are suppressed for security and user experience reasons.
      * In other environments, all errors are displayed, aiding in development and debugging.
      */
-    $errorfile = dirname(__DIR__, 2).ERRORLOG_FILE;
+    $errorfile = dirname(__DIR__, 2).cml_config('ERRORLOG_FILE');
+    $production = cml_config('PRODUCTION');
 
     // Turn off error reporting in production environment, enable otherwise
-    error_reporting(PRODUCTION ? 0 : E_ALL);
-    ini_set('display_errors', PRODUCTION || (CML_DEBUG && !PRODUCTION) ? 0 : 1);
+    error_reporting($production ? 0 : E_ALL);
+    ini_set('display_errors', $production || (cml_config('CML_DEBUG') && !$production) ? 0 : 1);
 
     // If debug mode is enabled, set a custom error handler
-    if (CML_DEBUG && !PRODUCTION) {
+    if (cml_config('CML_DEBUG') && !$production) {
         set_error_handler("customError");
     } else {
         // Turn off error reporting when not in debug mode
-        mysqli_report(PRODUCTION ? MYSQLI_REPORT_OFF : MYSQLI_REPORT_ERROR);
+        mysqli_report($production ? MYSQLI_REPORT_OFF : MYSQLI_REPORT_ERROR);
     }
 
     ini_set('log_errors', 1);

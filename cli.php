@@ -218,7 +218,7 @@ function downloadComponent($options){
         return;
     }
 
-    $path = useTrait('getRootPath', COMPONENTS_PATH);
+    $path = useTrait('getRootPath', cml_config('COMPONENTS_PATH'));
     $url = 'https://docs.callmeleon.de/download/'.$options[0];
 
     $filename = $options[0].'.cml.php';

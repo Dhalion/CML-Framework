@@ -104,7 +104,7 @@ class Router extends \CML\Classes\HTMLBuilder{
      *
      * @var string
      */
-    public string $sitesPath = SITES_PATH ?? '';
+    public string $sitesPath = "";
     
     /**
      * Stores the named routes with their corresponding URLs.
@@ -126,6 +126,7 @@ class Router extends \CML\Classes\HTMLBuilder{
      * Merges the $_GET superglobal array with the query parameters obtained from the getQueryParams() method.
      */
     public function __construct(){
+        $this->sitesPath = cml_config('SITES_PATH');
         $_GET = array_merge($_GET, $this->getQueryParams());
     }
 
@@ -607,7 +608,7 @@ class Router extends \CML\Classes\HTMLBuilder{
             $slot = $matches[3] ?? null;
 
             $componentName = $tag . '.cml.php';
-            $componentPath = self::getRootPath(COMPONENTS_PATH . $componentName);
+            $componentPath = self::getRootPath(cml_config('COMPONENTS_PATH') . $componentName);
 
             if (file_exists($componentPath) && preg_match('~^\p{Lu}~u', $tag)) {
                 $attributeValues = [];

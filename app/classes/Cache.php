@@ -39,7 +39,7 @@ abstract class Cache {
      * Initializes the cache directory.
      */
     private function initCache() {
-        $this->cacheDir = self::getRootPath(CACHE_PATH);
+        $this->cacheDir = self::getRootPath(cml_config('CACHE_PATH'));
         if (!file_exists($this->cacheDir)) {
             mkdir($this->cacheDir, 0777, true);
         }

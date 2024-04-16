@@ -23,17 +23,17 @@
     }
 
     /**
-     * Loads error handler from cml-error.php
-     */
-    if (file_exists($handler = __DIR__.'/cml-error.php')){
-        require_once $handler;
-    }
-
-    /**
      * Loads framework functions from cml-functions.php
      */
     if (file_exists($cml_functions = __DIR__.'/cml-functions.php')){
         require_once $cml_functions;
+    }
+
+    /**
+     * Loads error handler from cml-error.php
+     */
+    if (file_exists($handler = __DIR__.'/cml-error.php')){
+        require_once $handler;
     }
 
     /**
