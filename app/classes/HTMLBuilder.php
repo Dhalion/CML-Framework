@@ -420,8 +420,20 @@ abstract class HTMLBuilder extends Cache{
             require $path;
             return $this->minifyHTML(ob_get_clean());
         } else {
-            trigger_error(htmlentities("Component $component | not found in ".$path), E_USER_WARNING);
+            trigger_error(htmlentities("Component $component | not found in ".$path), E_USER_ERROR);
         }
+    }
+
+    /**
+     * Adds a component to a hook.
+     *
+     * @param string $hookName The name of the hook.
+     * @param string $component The name of the component to add.
+     * @param array $variables An array of variables to pass to the component.
+     * @param int $level The nesting level of the component.
+     */
+    public function componentHook(string $hookName, string $component, array $variables = [], int $level = 0) {
+        $this->addHook($hookName, $this->component($component, $variables, $level));
     }
 
     /**
