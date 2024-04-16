@@ -1,17 +1,19 @@
 <?php 
 /**
- * Executes a function from the CML\Classes\Functions namespace using the provided function name and parameters.
+ * A helper function to use traits and call their methods dynamically.
  *
- * @param string $functionName The name of the function to execute.
- * @param mixed  ...$parameters The parameters to pass to the function.
- * @return mixed The result of the executed function.
+ * @param string $functionName The name of the method to call from the trait.
+ * @param mixed  ...$parameters The parameters to pass to the method.
+ *
+ * @return mixed The result of the method call, or an instance of the class with the traits if no method name is provided.
  */
-function useTrait(string $functionName, ...$parameters) {
+function useTrait(string $functionName = "", ...$parameters) {
     $class = new class {
         use CML\Classes\Functions\Functions;
         use CML\Classes\Functions\Session;
     };
-    return $class->$functionName(...$parameters);
+
+    return empty($functionName) ? $class : $class->$functionName(...$parameters);
 }
 
 /**
