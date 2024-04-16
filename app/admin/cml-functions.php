@@ -48,7 +48,9 @@ function cml_config($config = null){
     if(is_array($config)){
         foreach($config as $key => $value){
             $cml_config[$key] = $value;
-            define($key, $value);
+            if(!defined($key)){
+                define($key, $value);
+            }
         }
     }
 }
