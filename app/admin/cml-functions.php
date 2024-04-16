@@ -42,7 +42,7 @@ function cml_config($config = null){
     }
 
     if(is_string($config)){
-        return $cml_config[$config];
+        return isset($cml_config[$config]) ? $cml_config[$config] : null;
     }
 
     if(is_array($config)){
