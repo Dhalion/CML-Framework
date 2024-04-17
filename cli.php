@@ -169,10 +169,10 @@ function updateCML($url = "https://api.github.com/repos/CallMeLeon167/CML-Framew
     $response = json_decode($response);
     if ($response){
         $file_name = "cli.php";
-        $key = array_search($file_name, array_column($files, 'name'));
+        $key = array_search($file_name, array_column($response, 'name'));
 
         if ($key !== false) {
-            $cli_php_object = $files[$key];
+            $cli_php_object = $response[$key];
             $cliUrl = $cli_php_object->download_url;
             file_put_contents(__DIR__.'/cli.php', file_get_contents($cliUrl));
             echo "Update ".$cli_php_object->name." complete!\n"; 
