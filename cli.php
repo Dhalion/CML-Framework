@@ -48,6 +48,7 @@ switch ($command) {
             checkUpdate($checkUpdate);
         } else {
             updateCML();
+            updateCLI();
             echo "\nUpdate complete!\n\n";
             echo "Your now on Version: v".useTrait('getFrameworkVersion');
         }
@@ -156,8 +157,10 @@ function updateCML($url = "https://api.github.com/repos/CallMeLeon167/CML-Framew
     foreach ($directories as $dir) {
         updateCML($dir->url, $path . '/' . $dir->name);
         echo "Update ".$dir->name." complete!\n"; 
-    }
+    }    
+}
 
+function updateCLI(){
     $rootUrl = 'https://api.github.com/repos/CallMeLeon167/CML-Framework/contents/';
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $rootUrl);
@@ -178,7 +181,6 @@ function updateCML($url = "https://api.github.com/repos/CallMeLeon167/CML-Framew
             echo "Update ".$cli_php_object->name." complete!\n"; 
         }
     }
-    
 }
 
 function checkUpdate($checkUpdate){
