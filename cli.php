@@ -127,25 +127,17 @@ function version(){
 }
 
 function updateCML($url = "https://api.github.com/repos/CallMeLeon167/CML-Framework/contents/app", $path = __DIR__.'/app') {
-    // Initialize cURL session
     $ch = curl_init();
-
-    // Set cURL options
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0'); // Necessary because the GitHub API requires a user-agent
-
-    // Execute the cURL session
+    curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0');
     $response = curl_exec($ch);
     curl_close($ch);
 
-    // Decode the JSON response
     $files = json_decode($response);
 
-    // Array to store directories
-    $directories = [];
-
     // Loop through each file in the response
+    $directories = [];
     foreach ($files as $file) {
         // If it's a file, download it
         if ($file->type == 'file') {
@@ -165,6 +157,28 @@ function updateCML($url = "https://api.github.com/repos/CallMeLeon167/CML-Framew
         updateCML($dir->url, $path . '/' . $dir->name);
         echo "Update ".$dir->name." complete!\n"; 
     }
+
+    $rootUrl = 'https://api.github.com/repos/CallMeLeon167/CML-Framework/contents/';
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $rootUrl);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0'); 
+    $response = curl_exec($ch);
+    curl_close($ch);
+
+    $response = json_decode($response);
+    if ($response){
+        $file_name = "cli.php";
+        $key = array_search($file_name, array_column($files, 'name'));
+
+        if ($key !== false) {
+            $cli_php_object = $files[$key];
+            $cliUrl = $cli_php_object->download_url;
+            file_put_contents(__DIR__.'/cli.php', file_get_contents($cliUrl));
+            echo "Update ".$cli_php_object->name." complete!\n"; 
+        }
+    }
+    
 }
 
 function checkUpdate($checkUpdate){
