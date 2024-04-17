@@ -319,13 +319,19 @@ abstract class HTMLBuilder extends Cache{
      * @param int      $level         The priority level for rendering the content (higher levels are rendered first).
      */
     public function addHook(string $hookName, $contentSource, int $level = 0) {
-        if(!in_array($hookName, $this->regHooks)){
-            trigger_error("Invalid hook name: $hookName", E_USER_WARNING);
-        }
         $this->hooks[$hookName][] = [
             'source' => $contentSource,
             'level' => $level,
         ];
+    }
+
+    /**
+     * Adds a custom hook name to the list of registered hooks and echoes the hook content.
+     *
+     * @param string $customHookName The name of the custom hook.
+     */
+    public function setHook(string $customHookName){
+        echo $this->_getHookContent($customHookName);
     }
 
     /**
