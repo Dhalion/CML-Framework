@@ -62,7 +62,7 @@ class DB
      * @param string $host The database host.
      * @param string $user The database username.
      * @param string $pass The database password.
-     * @param string $dbName
+     * @param string $dbName The database name.
      */
     public function connect(string $host, string $user, string $pass, string $dbName): void
     {
@@ -280,7 +280,7 @@ class DB
     /**
      * Executes an SQL query from a file and returns the result as JSON.
      *
-     * @param string $fileName
+     * @param string $fileName The filename of the SQL query.
      * @param array $params Parameters for the SQL query (optional).
      * @return string|bool The result of the SQL query as a JSON-encoded string.
      * @throws Exception
