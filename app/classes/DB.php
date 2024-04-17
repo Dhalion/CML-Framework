@@ -11,7 +11,7 @@ use mysqli;
  * The DB class provides methods for establishing a connection to a MySQL database, executing SQL queries, and performing database operations.
  *
  * @author CallMeLeon <kontakt@callmeleon.de>
- * @see https://docs.callmeleon.de/cml#db
+ * @see https://docs.callmeleon.de/database
  */
 class DB
 {

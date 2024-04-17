@@ -10,7 +10,7 @@ namespace CML\Classes;
  * Additionally, it includes methods for rendering components and adding content to the HTML document.
  *
  * @author CallMeLeon <kontakt@callmeleon.de>
- * @see https://docs.callmeleon.de/cml#html-builder
+ * @see https://docs.callmeleon.de/html
  */
 abstract class HTMLBuilder extends Cache{
     use Functions\Functions;

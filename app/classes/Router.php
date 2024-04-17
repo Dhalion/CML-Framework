@@ -9,7 +9,7 @@ namespace CML\Classes;
  * executes the corresponding callback functions, and handles error cases.
  *
  * @author CallMeLeon <kontakt@callmeleon.de>
- * @see https://docs.callmeleon.de/cml#router
+ * @see https://docs.callmeleon.de/the-basics#Routing
  */
 class Router extends \CML\Classes\HTMLBuilder{
     use Functions\Functions;
