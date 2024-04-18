@@ -58,6 +58,11 @@ define('PRODUCTION', false);
  */
 define('CML_DEBUG', true);
 
+/**
+ * Enable or disable the debug bar.
+ */
+define('CML_DEBUG_BAR', false);
+
 /** 
  * Define the path to the log file.
  * 
