@@ -7,16 +7,35 @@ namespace CML\Classes;
  *
  * Cache provides methods for caching and retrieving HTML content.
  */
-abstract class Cache {
+class Cache {
     use Functions\Functions;
 
+    const MINUTE_IN_SECONDS = 60;
+    const HOUR_IN_SECONDS = 60 * 60;
+    const DAY_IN_SECONDS = 24 * 60 * 60;
+    const WEEK_IN_SECONDS = 7 * 24 * 60 * 60;
+    const MONTH_IN_SECONDS = 30 * 24 * 60 * 60;
+    const YEAR_IN_SECONDS = 365 * 24 * 60 * 60;
+
+    /**
+     * Indicates whether the cache is enabled or not.
+     *
+     * @var bool
+     */
     public bool $cacheEnabled = false;
 
     /**
      * Cache directory path
+     * 
+     * @var string
      */
     private string $cacheDir;
 
+    /**
+     * Cache config
+     * 
+     * @var array
+     */
     public array $cacheOptions;
 
     /**
