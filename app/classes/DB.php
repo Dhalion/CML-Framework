@@ -161,6 +161,9 @@ class DB
             throw new Exception("SQL Error: " . $stmt->error);
         }
 
+        $this->cml_db_update_amount();
+        $this->cml_db_update_request_query(['query' => $query, 'params' => $params]);
+
         $stmt->close();
         return $sqlArray;
     }
@@ -256,9 +259,34 @@ class DB
 
         $stmt->execute();
         $affectedRows = $stmt->affected_rows;
+
+        $this->cml_db_update_amount();
+        $this->cml_db_update_request_query(['query' => $query, 'params' => $params, 'affected_rows' => $affectedRows]);
+
         $stmt->close();
         return $affectedRows;
     }
+
+    /**
+     * Increases the value of the global variable $cml_db_request_amount by 1.
+     */
+    private function cml_db_update_amount()
+    {
+        global $cml_db_request_amount;
+        $cml_db_request_amount++;
+    }
+
+    /**
+     * Updates the request query data in the cml_db_request_query array.
+     *
+     * @param array $queryData The query data to be added to the cml_db_request_query array.
+     */
+    private function cml_db_update_request_query(array $queryData)
+    {
+        global $cml_db_request_query;
+        $cml_db_request_query[] = $queryData;
+    }
+
 
     /**
      * Executes an SQL query and returns the result as JSON.
