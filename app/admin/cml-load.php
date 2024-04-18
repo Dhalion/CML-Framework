@@ -42,3 +42,5 @@ if (file_exists($handler = __DIR__ . '/cml-error.php')) {
 if (file_exists($functions = dirname(__DIR__, 2) . '/functions.php')) {
     require_once $functions;
 }
+
+header('X-Powered-By: CML-Framework/' .  useTrait()::getFrameworkVersion() . " - PHP/" . phpversion());

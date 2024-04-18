@@ -259,6 +259,7 @@ trait Session
             foreach ($data as $key => $value) {
                 $this->setSessionData($key, $value);
             }
+            return null;
         } else {
             return null;
         }
