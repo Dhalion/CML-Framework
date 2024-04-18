@@ -38,6 +38,14 @@ class Router extends \CML\Classes\HTMLBuilder
      */
     public string $currentUrl = '';
 
+
+    /**
+     * The current name of the router.
+     *
+     * @var string
+     */
+    public string $currentRouteName = '';
+
     /**
      * Stores the current HTTP request method.
      *
@@ -443,6 +451,7 @@ class Router extends \CML\Classes\HTMLBuilder
         } // Check if the URL is "index.php" and redirect to the root route
         $url = str_replace("//", "/", $url); // Remove double slashes from the URL
         $this->currentUrl = $url;
+        $this->currentRouteName = array_flip($this->namedRoutes)[$this->currentUrl] ?? $this->currentUrl;
 
         // Clear current site cache and preload ist
         if ($this->cacheEnabled && isset($_GET[$this->cacheOptions['config']['clearCurrent']])) {
