@@ -186,7 +186,7 @@ class DB
         $sqlContent = file_get_contents($filepath);
         $queries = explode(';', $sqlContent);
 
-        return array_map(fn($query) => $this->sql2array(trim($query), $params), array_filter($queries));
+        return array_map(fn ($query) => $this->sql2array(trim($query), $params), array_filter($queries));
     }
 
     /**

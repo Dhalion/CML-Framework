@@ -1,4 +1,5 @@
-<?php 
+<?php
+
 namespace CML\Classes;
 
 /**
@@ -12,7 +13,8 @@ namespace CML\Classes;
  * @author CallMeLeon <kontakt@callmeleon.de>
  * @see https://docs.callmeleon.de/html
  */
-abstract class HTMLBuilder extends Cache{
+abstract class HTMLBuilder extends Cache
+{
     use Functions\Functions;
 
     const BEFORE_HEAD = 'before_head';
@@ -63,12 +65,12 @@ abstract class HTMLBuilder extends Cache{
      * @var string The HTML code for the footer section.
      */
     private string $footer = "";
-    
+
     /**
      * @var string The language of the web page.
      */
     private string $langAttr = "en";
-    
+
     /**
      * @var string The character encoding for the web page.
      */
@@ -131,7 +133,8 @@ abstract class HTMLBuilder extends Cache{
     /**
      * Activates HTML minification.
      */
-    public function activateMinifyHTML() {
+    public function activateMinifyHTML()
+    {
         $this->minifyHTML = true;
     }
 
@@ -140,7 +143,8 @@ abstract class HTMLBuilder extends Cache{
      *
      * @param string $projectName The project name.
      */
-    public function setProjectName(string $projectName) {
+    public function setProjectName(string $projectName)
+    {
         $this->projectName = $projectName;
         $this->setTitle($this->projectName);
     }
@@ -150,7 +154,8 @@ abstract class HTMLBuilder extends Cache{
      *
      * @param string $title The title of the HTML document.
      */
-    public function setTitle(string $title) {
+    public function setTitle(string $title)
+    {
         $this->title = $title;
     }
 
@@ -159,7 +164,8 @@ abstract class HTMLBuilder extends Cache{
      *
      * @param string $favicon The path to the favicon.
      */
-    public function setFavicon(string $favicon) {
+    public function setFavicon(string $favicon)
+    {
         $this->favicon = $favicon;
     }
 
@@ -169,14 +175,16 @@ abstract class HTMLBuilder extends Cache{
      * @param string|array $header The header element to add  or variables if array.
      * @param array $variables Associative array of variables to be extracted and made available in the included file.
      */
-    public function addHeader($header = '', array $variables = []) {
-        $this->_addContent(cml_config('COMPONENTS_PATH').'header.php', $header, $this->header, $variables);
+    public function addHeader($header = '', array $variables = [])
+    {
+        $this->_addContent(cml_config('COMPONENTS_PATH') . 'header.php', $header, $this->header, $variables);
     }
 
     /**
      * Removes the header from the HTML document.
      */
-    public function removeHeader(){
+    public function removeHeader()
+    {
         $this->header = "";
     }
 
@@ -186,14 +194,16 @@ abstract class HTMLBuilder extends Cache{
      * @param string|array $footer The footer element to add  or variables if array.
      * @param array $variables Associative array of variables to be extracted and made available in the included file.
      */
-    public function addFooter($footer = '', array $variables = []) {
-        $this->_addContent(cml_config('COMPONENTS_PATH').'footer.php', $footer, $this->footer, $variables);
+    public function addFooter($footer = '', array $variables = [])
+    {
+        $this->_addContent(cml_config('COMPONENTS_PATH') . 'footer.php', $footer, $this->footer, $variables);
     }
 
     /**
      * Removes the footer from the HTML document.
      */
-    public function removeFooter(){
+    public function removeFooter()
+    {
         $this->footer = "";
     }
 
@@ -203,7 +213,8 @@ abstract class HTMLBuilder extends Cache{
      * @param string $attr The HTML tag attributes to be added.
      * @deprecated since version 2.8, to be removed in 3.0. Use html_filter() instead.
      */
-    public function addHtmlTagAttributes(string $attr) {
+    public function addHtmlTagAttributes(string $attr)
+    {
         $this->htmlAttr[] = $attr;
     }
 
@@ -213,7 +224,8 @@ abstract class HTMLBuilder extends Cache{
      * @param string $attr The body tag attributes to be added.
      * @deprecated since version 2.8, to be removed in 3.0. Use html_filter() instead.
      */
-    public function addBodyTagAttributes(string $attr) {
+    public function addBodyTagAttributes(string $attr)
+    {
         $this->bodyAttr[] = $attr;
     }
 
@@ -224,7 +236,8 @@ abstract class HTMLBuilder extends Cache{
      * @param \Closure $function The filter function to apply.
      * @return mixed The filtered attribute value.
      */
-    public function html_filter(string $htmlFilter, \Closure $function) {
+    public function html_filter(string $htmlFilter, \Closure $function)
+    {
         $accepted = ['html', 'body', 'lang', 'title', 'charset'];
         $htmlFilter = strtolower($htmlFilter);
 
@@ -233,7 +246,7 @@ abstract class HTMLBuilder extends Cache{
             return null;
         }
 
-        if($htmlFilter == 'title'){
+        if ($htmlFilter == 'title') {
             $filter = call_user_func($function, $this->title);
             return $this->title = $filter;
         } else {
@@ -248,7 +261,8 @@ abstract class HTMLBuilder extends Cache{
      * @param string $lang The lang attribute of the document.
      * @deprecated since version 2.8, to be removed in 3.0. Use html_filter() instead.
      */
-    public function setLang(string $lang) {
+    public function setLang(string $lang)
+    {
         $this->langAttr = $lang;
     }
 
@@ -258,7 +272,8 @@ abstract class HTMLBuilder extends Cache{
      * @return string The lang attribute of the document.
      * @deprecated since version 2.8, to be removed in 3.0. Use html_filter() instead.
      */
-    public function getLang():string {
+    public function getLang(): string
+    {
         return $this->langAttr;
     }
 
@@ -268,7 +283,8 @@ abstract class HTMLBuilder extends Cache{
      * @param string $charset The charset attribute of the document.
      * @deprecated since version 2.8, to be removed in 3.0. Use html_filter() instead.
      */
-    public function setCharset(string $charset) {
+    public function setCharset(string $charset)
+    {
         $this->charsetAttr = $charset;
     }
 
@@ -278,14 +294,15 @@ abstract class HTMLBuilder extends Cache{
      * @param string $type The type of the CDN link (e.g., 'link', 'script', etc.).
      * @param string $attr The attribute information for the CDN link.
      */
-    public function addCDN(string $type, string $attr) {
+    public function addCDN(string $type, string $attr)
+    {
         $validTypes = ['link', 'script'];
         $type = strtolower($type);
-    
+
         if (!in_array($type, $validTypes)) {
             trigger_error("Invalid CDN type: $type", E_USER_WARNING);
         }
-    
+
         $this->cdns[] = [$type => $attr];
     }
 
@@ -294,7 +311,8 @@ abstract class HTMLBuilder extends Cache{
      *
      * @param string $attrs The attributes of the meta tag.
      */
-    public function addMeta(string $attrs) {
+    public function addMeta(string $attrs)
+    {
         $this->metas[] = $attrs;
     }
 
@@ -306,7 +324,8 @@ abstract class HTMLBuilder extends Cache{
      *
      * @param string $var The name of the JavaScript variable to store the Ajax URL. Default value is "ajax_url".
      */
-    public function setAjaxUrl(string $var = "ajax_url"){
+    public function setAjaxUrl(string $var = "ajax_url")
+    {
         $this->ajaxVar = $var;
         $this->ajaxUrl = $this->url("app/admin/cml-ajax.php");
     }
@@ -318,7 +337,8 @@ abstract class HTMLBuilder extends Cache{
      * @param mixed    $contentSource The file path, a callable function, or HTML code to provide content.
      * @param int      $level         The priority level for rendering the content (higher levels are rendered first).
      */
-    public function addHook(string $hookName, $contentSource, int $level = 0) {
+    public function addHook(string $hookName, $contentSource, int $level = 0)
+    {
         $this->hooks[$hookName][] = [
             'source' => $contentSource,
             'level' => $level,
@@ -330,7 +350,8 @@ abstract class HTMLBuilder extends Cache{
      *
      * @param string $customHookName The name of the custom hook.
      */
-    public function setHook(string $customHookName){
+    public function setHook(string $customHookName)
+    {
         echo $this->_getHookContent($customHookName);
     }
 
@@ -341,7 +362,8 @@ abstract class HTMLBuilder extends Cache{
      * @param string|array $attributes Additional attributes for the link element (optional).
      * @param bool $fromRoot Whether the path is relative to the document root.
      */
-    public function addStyle(string $href, $attributes = "", bool $fromRoot = false) {
+    public function addStyle(string $href, $attributes = "", bool $fromRoot = false)
+    {
         if ($href) $this->_addResource($href, $this->styles, $attributes, $fromRoot);
     }
 
@@ -352,7 +374,8 @@ abstract class HTMLBuilder extends Cache{
      * @param string|array $attributes Additional attributes for the script element (optional).
      * @param bool $fromRoot Whether the path is relative to the document root.
      */
-    public function addScript(string $src, $attributes = "", bool $fromRoot = false) {
+    public function addScript(string $src, $attributes = "", bool $fromRoot = false)
+    {
         if ($src) $this->_addResource($src, $this->scripts, $attributes, $fromRoot);
     }
 
@@ -365,10 +388,11 @@ abstract class HTMLBuilder extends Cache{
      * @param string $attributes Additional attributes to add to the HTML tag (default: empty string).
      * @return string The path of the module file.
      */
-    public function node_module(string $moduleName, string $extension = 'min.js', bool $autoAdd = true, $attributes = ""): string {
+    public function node_module(string $moduleName, string $extension = 'min.js', bool $autoAdd = true, $attributes = ""): string
+    {
         $lowercaseModuleName = strtolower($moduleName);
         $moduleDir = self::getRootPath('/node_modules/' . $lowercaseModuleName);
-    
+
         if (is_dir($moduleDir)) {
             $files = $this->_recursiveFileSearch($moduleDir, $extension);
             if (!empty($files)) {
@@ -402,7 +426,8 @@ abstract class HTMLBuilder extends Cache{
      * @param string $extension The file extension to search for.
      * @return array An array of file paths matching the specified extension.
      */
-    protected function _recursiveFileSearch(string $dir, string $extension): array {
+    protected function _recursiveFileSearch(string $dir, string $extension): array
+    {
         $files = glob($dir . "/*.$extension");
         foreach (glob($dir . '/*', GLOB_ONLYDIR) as $subdir) {
             $files = array_merge($files, $this->_recursiveFileSearch($subdir, $extension));
@@ -416,17 +441,18 @@ abstract class HTMLBuilder extends Cache{
      * @param string $component The name of the component to be rendered.
      * @param array $variables An associative array of variables to be extracted and made available within the component.
      */
-    public function component(string $component, array $variables = []) {
-        $component = str_replace(".php", '', $component).".php";
-        $path = self::getRootPath(cml_config('COMPONENTS_PATH').$component);
-        
+    public function component(string $component, array $variables = [])
+    {
+        $component = str_replace(".php", '', $component) . ".php";
+        $path = self::getRootPath(cml_config('COMPONENTS_PATH') . $component);
+
         if (file_exists($path)) {
             extract($variables);
             ob_start();
             require $path;
             return $this->minifyHTML(ob_get_clean());
         } else {
-            trigger_error(htmlentities("Component $component | not found in ".$path), E_USER_ERROR);
+            trigger_error(htmlentities("Component $component | not found in " . $path), E_USER_ERROR);
         }
     }
 
@@ -438,7 +464,8 @@ abstract class HTMLBuilder extends Cache{
      * @param array $variables An array of variables to pass to the component.
      * @param int $level The nesting level of the component.
      */
-    public function componentHook(string $hookName, string $component, array $variables = [], int $level = 0) {
+    public function componentHook(string $hookName, string $component, array $variables = [], int $level = 0)
+    {
         $this->addHook($hookName, $this->component($component, $variables, $level));
     }
 
@@ -450,13 +477,14 @@ abstract class HTMLBuilder extends Cache{
      * @param string &$property The property to store the content in.
      * @param array $variables Associative array of variables to be extracted and made available in the included file.
      */
-    protected function _addContent(string $path, $contentOrVariable, string &$property, array $variables = []) {
+    protected function _addContent(string $path, $contentOrVariable, string &$property, array $variables = [])
+    {
         $contentFile = $path ?? '';
         if (empty($contentFile) && empty($contentOrVariable)) {
             return trigger_error("Could not set the $path", E_USER_ERROR);
         }
 
-        if(is_array($contentOrVariable)) {
+        if (is_array($contentOrVariable)) {
             extract($contentOrVariable);
             goto a;
         }
@@ -482,14 +510,15 @@ abstract class HTMLBuilder extends Cache{
      * @param array $attributes
      * @return string
      */
-    protected function _arrToHtmlAttrs(array $attributes): string {
+    protected function _arrToHtmlAttrs(array $attributes): string
+    {
         $htmlAttributes = '';
         foreach ($attributes as $key => $value) {
             $htmlAttributes .= " $key=\"$value\"";
         }
         return $htmlAttributes;
     }
-    
+
     /**
      * Adds a resource link to the HTML document.
      *
@@ -498,7 +527,8 @@ abstract class HTMLBuilder extends Cache{
      * @param string|array $attributes Additional attributes for the HTML element (e.g., 'media="screen"', 'async', 'defer', etc.).
      * @param bool $fromRoot Whether the path is relative to the document root.
      */
-    protected function _addResource(string $path, array &$container, $attributes = "", bool $fromRoot = false) {
+    protected function _addResource(string $path, array &$container, $attributes = "", bool $fromRoot = false)
+    {
         $const = $container === $this->styles ? 'STYLE_PATH' : 'SCRIPT_PATH';
 
         $fullPath = $fromRoot ? $path : (constant($const) ?? '') . $path;
@@ -527,7 +557,8 @@ abstract class HTMLBuilder extends Cache{
      * @param string $fileExtension The file extension to use for the compressed file.
      * @return string The path to the compressed file.
      */
-    protected static function _compressFile(string $path, string $configPath, string $fileExtension): string {
+    protected static function _compressFile(string $path, string $configPath, string $fileExtension): string
+    {
         $newFileName = str_replace($fileExtension, ".min{$fileExtension}", $path);
         $filePath = self::getRootPath($configPath ? $configPath . $path : $path);
         $compressDir = "_min/";
@@ -557,12 +588,12 @@ abstract class HTMLBuilder extends Cache{
         $compressedFilePath = $compressedPath . $newFileName;
 
         if (file_exists($compressedFilePath) && file_get_contents($compressedFilePath) === $fileContent) {
-            return $compressDir.$newFileName;
+            return $compressDir . $newFileName;
         }
 
         file_put_contents($compressedFilePath, $fileContent);
 
-        return $compressDir.$newFileName;
+        return $compressDir . $newFileName;
     }
 
     /**
@@ -571,9 +602,10 @@ abstract class HTMLBuilder extends Cache{
      * @param string $path The path to the CSS or JavaScript file to compress.
      * @return string The path to the compressed file.
      */
-    public static function compress(string $path):string {
+    public static function compress(string $path): string
+    {
         $fileExtension = pathinfo($path, PATHINFO_EXTENSION);
-        
+
         if ($fileExtension === 'css') {
             return self::_compressFile($path, cml_config('STYLE_PATH') ?? '', '.css');
         } elseif ($fileExtension === 'js') {
@@ -589,14 +621,15 @@ abstract class HTMLBuilder extends Cache{
      * @param string $hookName The name of the hook (e.g., 'before_head', 'after_head', 'top_body', etc.).
      * @return string The content for the specified hook.
      */
-    protected function _getHookContent(string $hookName) {
+    protected function _getHookContent(string $hookName)
+    {
         if (isset($this->hooks[$hookName])) {
             $hooks = $this->hooks[$hookName];
             $this->_sortByKey($hooks, "level");
 
             foreach ($hooks as $hook) {
                 $contentSource = $hook['source'];
-                
+
                 if (is_callable($contentSource)) {
                     $content = call_user_func($contentSource);
                     echo is_string($content) ? $content : '';
@@ -620,8 +653,9 @@ abstract class HTMLBuilder extends Cache{
      * @param array $array The array to be sorted (passed by reference).
      * @param string $key The key by which the array should be sorted.
      */
-    protected function _sortByKey(array &$array, $key) {
-        usort($array, function($a, $b) use ($key) {
+    protected function _sortByKey(array &$array, $key)
+    {
+        usort($array, function ($a, $b) use ($key) {
             return $b[$key] - $a[$key];
         });
     }
@@ -637,7 +671,8 @@ abstract class HTMLBuilder extends Cache{
      *
      * @return string The minified HTML content without unnecessary spaces and comments.
      */
-    public function minifyHTML(string $html):string {
+    public function minifyHTML(string $html): string
+    {
         if ($this->minifyHTML === true) {
             // Remove spaces, line breaks, and tabs
             $minified = preg_replace('/\s+/', ' ', $html);
@@ -655,8 +690,9 @@ abstract class HTMLBuilder extends Cache{
      *
      * @param string $cacheKey The key used to identify the cached content.
      */
-    public function checkCache(string $cacheKey){
-        if($this->cacheEnabled === true){
+    public function checkCache(string $cacheKey)
+    {
+        if ($this->cacheEnabled === true) {
             $cachedContent = $this->getCache($cacheKey);
             if ($cachedContent !== false && cml_config('PRODUCTION') !== true) {
                 echo $cachedContent;
@@ -668,25 +704,27 @@ abstract class HTMLBuilder extends Cache{
     /**
      * Builds the complete HTML structure.
      */
-    protected function buildHTML(string $outputContent = ""){
+    protected function buildHTML(string $outputContent = "")
+    {
         $cacheKey = $this->currentUrl;
         $this->checkCache($cacheKey);
-        
+
         $attrHTML = $this->_arrToHtmlAttrs($this->htmlAttr);
         $attrBody = $this->_arrToHtmlAttrs($this->bodyAttr);
 
         ob_start();
-        ?>
+?>
         <!DOCTYPE html>
-        <html lang="<?= $this->langAttr ?>"<?= $attrHTML?>>
+        <html lang="<?= $this->langAttr ?>" <?= $attrHTML ?>>
         <?= $this->_getHookContent(self::BEFORE_HEAD); ?>
+
         <head>
             <?= $this->_getHookContent(self::TOP_HEAD); ?>
             <meta charset="<?= $this->charsetAttr ?>">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <?php $this->_buildMetas(); ?>
-            <title><?= empty($this->title) ? cml_config('APP_NAME') : $this->title?></title>
-            <?= !empty($this->ajaxUrl) ? "<script>let {$this->ajaxVar} = '{$this->ajaxUrl}'</script>" : ''?>
+            <title><?= empty($this->title) ? cml_config('APP_NAME') : $this->title ?></title>
+            <?= !empty($this->ajaxUrl) ? "<script>let {$this->ajaxVar} = '{$this->ajaxUrl}'</script>" : '' ?>
             <link rel="icon" type="image/x-icon" href="<?= self::url($this->favicon) ?>">
             <?php $this->_buildCdns(); ?>
             <?php $this->_buildStyles(); ?>
@@ -698,16 +736,16 @@ abstract class HTMLBuilder extends Cache{
         <?= "<body{$attrBody}>"; ?>
         <?= $this->_getHookContent(self::TOP_BODY); ?>
         <?= $this->header; ?>
-        <?= $this->minifyHTML($outputContent)?> 
+        <?= $this->minifyHTML($outputContent) ?>
         <?= $this->_getHookContent(self::BEFORE_BODY); ?>
         <?= $this->footer; ?>
-        <?= PHP_EOL.'</body>'; ?>
+        <?= PHP_EOL . '</body>'; ?>
         <?= $this->_getHookContent(self::AFTER_BODY); ?>
-        <?= PHP_EOL.'</html>'; ?>
+        <?= PHP_EOL . '</html>'; ?>
         <?php
         $htmlContent = $this->minifyHTML(preg_replace('/\h+(?=<)/', ' ', ob_get_clean()));
-        
-        if($this->cacheEnabled === true){
+
+        if ($this->cacheEnabled === true) {
             $this->setCache($cacheKey, $htmlContent);
         }
 
@@ -718,41 +756,45 @@ abstract class HTMLBuilder extends Cache{
     /**
      * Builds meta tags in the head section based on the provided array of meta attributes.
      */
-    protected function _buildMetas() {
-        foreach ($this->metas as $meta): ?>
+    protected function _buildMetas()
+    {
+        foreach ($this->metas as $meta) : ?>
             <meta <?= $meta ?>>
         <?php endforeach;
     }
-    
+
     /**
      * Builds content delivery network (CDN) links based on the provided array of CDNs.
      */
-    protected function _buildCdns() {
-        foreach ($this->cdns as $cdns): ?>
-            <?php foreach ($cdns as $tag => $attributes): ?>
+    protected function _buildCdns()
+    {
+        foreach ($this->cdns as $cdns) : ?>
+            <?php foreach ($cdns as $tag => $attributes) : ?>
                 <<?= $tag ?> <?= $attributes ?>>
-                <?php if ($tag == "script"): ?>
-                    </<?= $tag ?>>
-                <?php endif; ?>
-            <?php endforeach; ?>
-        <?php endforeach;
+                    <?php if ($tag == "script") : ?>
+                </<?= $tag ?>>
+            <?php endif; ?>
+        <?php endforeach; ?>
+    <?php endforeach;
     }
-    
+
     /**
      * Builds stylesheet links in the head section based on the provided array of styles.
      */
-    protected function _buildStyles() {
-        foreach ($this->styles as $style): ?>
-            <link rel="stylesheet" href=<?= $style ?>>
-        <?php endforeach;
+    protected function _buildStyles()
+    {
+        foreach ($this->styles as $style) : ?>
+        <link rel="stylesheet" href=<?= $style ?>>
+    <?php endforeach;
     }
-  
+
     /**
      * Builds script tags in the head or body section based on the provided array of scripts.
      */
-    protected function _buildScripts() {
-        foreach ($this->scripts as $script): ?>
-            <script src=<?= $script ?>></script>
-        <?php endforeach;
+    protected function _buildScripts()
+    {
+        foreach ($this->scripts as $script) : ?>
+        <script src=<?= $script ?>></script>
+<?php endforeach;
     }
 }

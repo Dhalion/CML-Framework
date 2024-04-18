@@ -1,4 +1,5 @@
-<?php 
+<?php
+
 /**
  * A helper function to use traits and call their methods dynamically.
  *
@@ -7,8 +8,10 @@
  *
  * @return mixed The result of the method call, or an instance of the class with the traits if no method name is provided.
  */
-function useTrait(string $functionName = "", ...$parameters) {
-    $class = new class {
+function useTrait(string $functionName = "", ...$parameters)
+{
+    $class = new class
+    {
         use CML\Classes\Functions\Functions;
         use CML\Classes\Functions\Session;
     };
@@ -23,7 +26,8 @@ function useTrait(string $functionName = "", ...$parameters) {
  * The registered functions will be stored in the global variable $cml_ajax_functions.
  */
 $cml_ajax_functions = array();
-function ajax(...$function) {
+function ajax(...$function)
+{
     global $cml_ajax_functions;
     $cml_ajax_functions = array_merge($cml_ajax_functions, $function);
 }
@@ -36,24 +40,24 @@ function ajax(...$function) {
  * @return mixed The CML configuration values if no parameter is provided, or the value of the specified configuration key.
  */
 $cml_config = get_defined_constants(true)['user'];
-function cml_config($config = null){
+function cml_config($config = null)
+{
     global $cml_config;
 
-    if(is_null($config)){
+    if (is_null($config)) {
         return $cml_config;
     }
 
-    if(is_string($config)){
+    if (is_string($config)) {
         return isset($cml_config[$config]) ? $cml_config[$config] : null;
     }
 
-    if(is_array($config)){
-        foreach($config as $key => $value){
+    if (is_array($config)) {
+        foreach ($config as $key => $value) {
             $cml_config[$key] = $value;
-            if(!defined($key)){
+            if (!defined($key)) {
                 define($key, $value);
             }
         }
     }
 }
-?>

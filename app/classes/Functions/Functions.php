@@ -1,7 +1,9 @@
 <?php
+
 namespace CML\Classes\Functions;
 
-trait Functions{
+trait Functions
+{
 
     /**
      * The version of the CML Framework.
@@ -16,16 +18,18 @@ trait Functions{
      *
      * @return string The current version of the framework.
      */
-    public static function getFrameworkVersion():string{
+    public static function getFrameworkVersion(): string
+    {
         return self::$cml_version;
-    } 
+    }
 
     /**
      * Redirect to the specified named route.
      *
      * @param string $name The name of the route to redirect to
      */
-    public function toRoute(string $name) {
+    public function toRoute(string $name)
+    {
         global $cml_namedRoutes;
         if (isset($cml_namedRoutes[$name])) {
             $url = $this->assetUrl($cml_namedRoutes[$name]);
@@ -42,7 +46,8 @@ trait Functions{
      * @param string|array $name The name of the header or an array of headers
      * @param string $value The value of the header (optional)
      */
-    public static function setHeader($name, string $value = '') {
+    public static function setHeader($name, string $value = '')
+    {
         if (is_array($name)) {
             foreach ($name as $headerName => $headerValue) {
                 if ($headerValue === '') {
@@ -66,7 +71,8 @@ trait Functions{
      * @param string $url The path to be appended to the base URL.
      * @return string The complete URL.
      */
-    public function url(string $url = ""):string {
+    public function url(string $url = ""): string
+    {
         return BASE_URL . ltrim($url, "/");
     }
 
@@ -79,7 +85,8 @@ trait Functions{
      * @param string $path The path to the asset, relative to the root of the application.
      * @return string The absolute URL of the asset.
      */
-    public function assetUrl(string $path = ""): string {
+    public function assetUrl(string $path = ""): string
+    {
         return rtrim(dirname($_SERVER['SCRIPT_NAME'], IS_AJAX ? 3 : 1), '/') . '/' . ltrim($path, '/');
     }
 
@@ -89,7 +96,8 @@ trait Functions{
      * @param string ...$desiredParams A variable number of parameter names to filter the query parameters.
      * @return mixed An array containing the filtered query parameters, or a single parameter value if only one is requested.
      */
-    public function getQueryParams(string ...$desiredParams) {
+    public function getQueryParams(string ...$desiredParams)
+    {
         // Initialize an array to store query parameters.
         $queryParams = array();
 
@@ -136,7 +144,8 @@ trait Functions{
      * @param string $methodName The name of the method to be called.
      * @param array $params An optional array of parameters to be passed to the method.
      */
-    public static function useController(string $controllerName, string $methodName, array $params = []) {
+    public static function useController(string $controllerName, string $methodName, array $params = [])
+    {
         $controllerClassName = 'CML\\Controllers\\' . $controllerName;
         if (class_exists($controllerClassName)) {
             $controllerInstance = new $controllerClassName();
@@ -161,26 +170,27 @@ trait Functions{
      * @param int    $interval The time interval in seconds during which the requests are counted.
      * @param string $message  The message to be output in case of exceeding the limit (default: "Too Many Requests").
      */
-    public function rateLimit(int $limit, int $interval, string $message = "To many requests") {
+    public function rateLimit(int $limit, int $interval, string $message = "To many requests")
+    {
         $this->startSession();
-    
+
         $ip = $_SERVER['REMOTE_ADDR'];
         $key = 'rate_limit:' . $ip;
-    
+
         $data = $this->getSessionData($key);
         $count = ($data['count']++ ?? 0);
 
         $lastAccess = ($data['last_access'] ?? 0);
         $currentTime = time();
-    
+
         if ($currentTime - $lastAccess >= $interval) {
             $count = 1;
             $lastAccess = $currentTime;
         } else {
             $count++;
         }
-    
-        $this->setSessionData($key,[
+
+        $this->setSessionData($key, [
             'count' => $count,
             'last_access' => $lastAccess,
         ]);
@@ -197,7 +207,8 @@ trait Functions{
      *
      * @return bool
      */
-    public function isAjaxRequest(): bool {
+    public function isAjaxRequest(): bool
+    {
         return IS_AJAX;
     }
 
@@ -207,7 +218,8 @@ trait Functions{
      * @param string $path (optional) A path to append to the root directory.
      * @return string containing the path to the root directory.
      */
-    public static function getRootPath(string $path = ''):string{
+    public static function getRootPath(string $path = ''): string
+    {
         return (dirname(__DIR__, 3) . '/' . ltrim($path, "/"));
     }
 }
@@ -215,11 +227,13 @@ trait Functions{
 /**
  * A trait for managing sessions in PHP.
  */
-trait Session {
+trait Session
+{
     /**
      * Starts or resumes a session if not already started.
      */
-    public function startSession() {
+    public function startSession()
+    {
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
         }
@@ -236,7 +250,8 @@ trait Session {
      *
      * @return mixed|null The session data or null if not found.
      */
-    public function session($data){
+    public function session($data)
+    {
         $this->startSession();
         if (is_string($data)) {
             return $this->getSessionData($data);
@@ -255,7 +270,8 @@ trait Session {
      * @param string $key The key under which the data will be stored.
      * @param mixed $value The data to be stored in the session.
      */
-    public function setSessionData(string $key, $value) {
+    public function setSessionData(string $key, $value)
+    {
         $this->startSession();
         $_SESSION[$key] = $value;
     }
@@ -267,7 +283,8 @@ trait Session {
      *
      * @return mixed|null The data stored under the specified key, or null if not found.
      */
-    public function getSessionData(string $key) {
+    public function getSessionData(string $key)
+    {
         $this->startSession();
         return $_SESSION[$key] ?? null;
     }
@@ -279,7 +296,8 @@ trait Session {
      *
      * @return bool True if the key exists, false otherwise.
      */
-    public function hasSessionData(string $key) {
+    public function hasSessionData(string $key)
+    {
         $this->startSession();
         return isset($_SESSION[$key]);
     }
@@ -289,7 +307,8 @@ trait Session {
      *
      * @return array An associative array of all session data.
      */
-    public function getAllSessionData() {
+    public function getAllSessionData()
+    {
         $this->startSession();
         return $_SESSION;
     }
@@ -299,7 +318,8 @@ trait Session {
      *
      * @return string The session save path.
      */
-    public function getSessionSavePath() {
+    public function getSessionSavePath()
+    {
         return session_save_path();
     }
 
@@ -307,7 +327,8 @@ trait Session {
      * Merges the given associative array with the existing session data.
      * @param array $data Associative array to merge with the session data.
      */
-    public function mergeSessionData(array $data) {
+    public function mergeSessionData(array $data)
+    {
         $this->startSession();
         $_SESSION = array_merge($_SESSION, $data);
     }
@@ -317,7 +338,8 @@ trait Session {
      *
      * @param string $path The path to save session data.
      */
-    public function setSessionSavePath(string $path) {
+    public function setSessionSavePath(string $path)
+    {
         session_save_path($path);
     }
 
@@ -328,7 +350,8 @@ trait Session {
      *
      * @return mixed|null The data stored under the specified key, or null if not found.
      */
-    public function pullSessionData(string $key) {
+    public function pullSessionData(string $key)
+    {
         $this->startSession();
         $value = $this->getSessionData($key);
         $this->unsetSessionData($key);
@@ -340,7 +363,8 @@ trait Session {
      *
      * @param string $key The key of the data to remove.
      */
-    public function unsetSessionData(string $key) {
+    public function unsetSessionData(string $key)
+    {
         $this->startSession();
         if (isset($_SESSION[$key])) {
             unset($_SESSION[$key]);
@@ -352,7 +376,8 @@ trait Session {
      *
      * @param int $minutes The number of minutes until the session expires.
      */
-    public function setSessionTimeout(int $minutes) {
+    public function setSessionTimeout(int $minutes)
+    {
         $this->startSession();
         $_SESSION['timeout'] = time() + ($minutes * 60);
     }
@@ -362,7 +387,8 @@ trait Session {
      *
      * @return bool True if the session has timed out, false otherwise.
      */
-    public function isSessionTimedOut() {
+    public function isSessionTimedOut()
+    {
         $this->startSession();
         return isset($_SESSION['timeout']) && time() > $_SESSION['timeout'];
     }
@@ -370,7 +396,8 @@ trait Session {
     /**
      * Regenerates the session id to prevent session fixation attacks.
      */
-    public function regenerateSessionId() {
+    public function regenerateSessionId()
+    {
         $this->startSession();
         session_regenerate_id(true);
     }
@@ -384,14 +411,16 @@ trait Session {
      * @param bool $secure If true cookie will only be sent over secure connections.
      * @param bool $httponly If set to true then PHP will attempt to send the httponly flag when setting the session cookie.
      */
-    public function setSessionCookieParams(int $lifetime, string $path = '/', string $domain = '', bool $secure = false, bool $httponly = true) {
+    public function setSessionCookieParams(int $lifetime, string $path = '/', string $domain = '', bool $secure = false, bool $httponly = true)
+    {
         session_set_cookie_params($lifetime, $path, $domain, $secure, $httponly);
     }
 
     /**
      * Clears all values from the session.
      */
-    public function clearSession() {
+    public function clearSession()
+    {
         $this->startSession();
         $_SESSION = array();
     }
@@ -401,14 +430,16 @@ trait Session {
      *
      * @return bool True if the session has been started, false otherwise.
      */
-    public function isSessionStarted() {
+    public function isSessionStarted()
+    {
         return session_status() == PHP_SESSION_ACTIVE;
     }
 
     /**
      * Ends the session and destroys all session data.
      */
-    public function endSession() {
+    public function endSession()
+    {
         $this->startSession();
         session_destroy();
     }

@@ -107,4 +107,3 @@ define('COMPONENTS_PATH', 'web/components/');
  * This constant defines the path where the cache files will be stored.
  */
 define('CACHE_PATH', 'cache/');
-?>

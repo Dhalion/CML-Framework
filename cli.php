@@ -33,7 +33,7 @@ switch ($command) {
         $onlyInserts = isset($options['--only-insert']);
         $noDrop = isset($options['--no-drop']);
 
-        $fileName = array_shift($argv) ?? "SQL_DUMP_".date('Y-m-d_H:i:s').".sql";
+        $fileName = array_shift($argv) ?? "SQL_DUMP_" . date('Y-m-d_H:i:s') . ".sql";
 
         $db = new CML\Classes\DB();
         $db->createDatabaseDump($fileName, !$noInsert, $onlyInserts, !$noDrop);
@@ -50,7 +50,7 @@ switch ($command) {
             updateCML();
             updateCLI();
             echo "\nUpdate complete!\n\n";
-            echo "Your now on Version: v".useTrait('getFrameworkVersion');
+            echo "Your now on Version: v" . useTrait('getFrameworkVersion');
         }
         break;
 
@@ -73,7 +73,8 @@ switch ($command) {
 }
 
 // CLI command: php cli.php create:controller TestController --db
-function createController($controllerName, $useDatabase) {
+function createController($controllerName, $useDatabase)
+{
     $controllerFilePath = __DIR__ . "/controllers/{$controllerName}.php";
 
     // Check if the file already exists
@@ -122,12 +123,14 @@ class {$controllerName} {
     }
 }
 
-function version(){
-    $version = "v".useTrait('getFrameworkVersion');
+function version()
+{
+    $version = "v" . useTrait('getFrameworkVersion');
     echo "CML Framework Version: {$version}\n";
 }
 
-function updateCML($url = "https://api.github.com/repos/CallMeLeon167/CML-Framework/contents/app", $path = __DIR__.'/app') {
+function updateCML($url = "https://api.github.com/repos/CallMeLeon167/CML-Framework/contents/app", $path = __DIR__ . '/app')
+{
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -143,7 +146,7 @@ function updateCML($url = "https://api.github.com/repos/CallMeLeon167/CML-Framew
         // If it's a file, download it
         if ($file->type == 'file') {
             file_put_contents($path . '/' . $file->name, file_get_contents($file->download_url));
-        } 
+        }
         // If it's a directory, create it if it doesn't exist
         elseif ($file->type == 'dir') {
             $directories[] = $file;
@@ -156,36 +159,38 @@ function updateCML($url = "https://api.github.com/repos/CallMeLeon167/CML-Framew
     // Recursively call the function for each subdirectory
     foreach ($directories as $dir) {
         updateCML($dir->url, $path . '/' . $dir->name);
-        echo "Update ".$dir->name." complete!\n"; 
-    }    
+        echo "Update " . $dir->name . " complete!\n";
+    }
 }
 
-function updateCLI(){
+function updateCLI()
+{
     $rootUrl = 'https://api.github.com/repos/CallMeLeon167/CML-Framework/contents/';
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $rootUrl);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0'); 
+    curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0');
     $response = curl_exec($ch);
     curl_close($ch);
 
     $response = json_decode($response);
-    if ($response){
+    if ($response) {
         $file_name = "cli.php";
         $key = array_search($file_name, array_column($response, 'name'));
 
         if ($key !== false) {
             $cli_php_object = $response[$key];
             $cliUrl = $cli_php_object->download_url;
-            file_put_contents(__DIR__.'/cli.php', file_get_contents($cliUrl));
-            echo "Update ".$cli_php_object->name." complete!\n"; 
+            file_put_contents(__DIR__ . '/cli.php', file_get_contents($cliUrl));
+            echo "Update " . $cli_php_object->name . " complete!\n";
         }
     }
 }
 
-function checkUpdate($checkUpdate){
-    if($checkUpdate){
-        $localVersion = "v".useTrait('getFrameworkVersion');
+function checkUpdate($checkUpdate)
+{
+    if ($checkUpdate) {
+        $localVersion = "v" . useTrait('getFrameworkVersion');
         $response = @json_decode(file_get_contents(
             "https://api.github.com/repos/CallMeLeon167/CML-Framework",
             false,
@@ -198,13 +203,13 @@ function checkUpdate($checkUpdate){
             ])
         ));
         $remoteVerions = $response ? ($response->default_branch ?? "Error: Unable to retrieve default branch information.") : "Error: Unable to retrieve data from GitHub API.";
-        if(strpos($remoteVerions, 'Error') !== false){
+        if (strpos($remoteVerions, 'Error') !== false) {
             echo "Unable to check for updates. Please try again later.\n";
             return;
         }
 
         // Compare version parts sequentially
-        if($remoteVerions == $localVersion){
+        if ($remoteVerions == $localVersion) {
             echo "Your CML Framework is up to date. Version: {$localVersion}\n";
         } else {
             echo "CML Framework {$remoteVerions} is available. Your Version: {$localVersion}\n";
@@ -212,8 +217,9 @@ function checkUpdate($checkUpdate){
     }
 }
 
-function do_action($options){
-    if(!isset($options[0])){
+function do_action($options)
+{
+    if (!isset($options[0])) {
         echo "No action provided.\n";
         return;
     }
@@ -227,28 +233,29 @@ function do_action($options){
     }
 }
 
-function downloadComponent($options){
-    if(!isset($options[0])){
+function downloadComponent($options)
+{
+    if (!isset($options[0])) {
         echo "No component provided.\n";
         echo "cml:component [component_name]\n";
         return;
     }
 
     $path = useTrait('getRootPath', cml_config('COMPONENTS_PATH'));
-    $url = 'https://docs.callmeleon.de/download/'.$options[0];
+    $url = 'https://docs.callmeleon.de/download/' . $options[0];
 
-    $filename = $options[0].'.cml.php';
+    $filename = $options[0] . '.cml.php';
 
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     $response = curl_exec($ch);
 
-    if(empty($response)) {
-        echo 'This Component is not available: "'.$options[0].'"';
+    if (empty($response)) {
+        echo 'This Component is not available: "' . $options[0] . '"';
     } else {
         $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        if($http_code == 200) {
+        if ($http_code == 200) {
             $pfad = $path . $filename;
             file_put_contents($pfad, $response);
             echo 'Component download was successfully and saved in: ' . $pfad;
@@ -259,7 +266,8 @@ function downloadComponent($options){
     curl_close($ch);
 }
 
-function help(){
+function help()
+{
     echo "Usage: php cli.php [command] [options]\n\n";
     echo "Available commands:\n";
     echo "  help \t\t\t\t\t\t\t\t\tShows CML Framework command list\n";
@@ -280,7 +288,8 @@ function help(){
     echo "  php cli.php create:controller TestController --db\n";
 }
 
-function showProgress($currentIteration, $totalIterations) {
+function showProgress($currentIteration, $totalIterations)
+{
     $percentage = round(($currentIteration / $totalIterations) * 100);
     $barLength = 20;
     $barFill = round($percentage / 100 * $barLength);

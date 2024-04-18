@@ -1,5 +1,5 @@
-<?php 
-require_once 'app/admin/cml-load.php'; 
+<?php
+require_once 'app/admin/cml-load.php';
 
 use CML\Classes\Router;
 use CML\Classes\DB;

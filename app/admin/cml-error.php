@@ -1,87 +1,89 @@
 <?php
 
-    /**
-     * Handles error configuration based on the environment.
-     *
-     * This function adjusts error reporting settings based on the environment,
-     * controlling the display of errors and logging them to a specified file.
-     * In the production environment, errors are suppressed for security and user experience reasons.
-     * In other environments, all errors are displayed, aiding in development and debugging.
-     */
-    $errorfile = dirname(__DIR__, 2).cml_config('ERRORLOG_FILE');
-    $production = cml_config('PRODUCTION');
+/**
+ * Handles error configuration based on the environment.
+ *
+ * This function adjusts error reporting settings based on the environment,
+ * controlling the display of errors and logging them to a specified file.
+ * In the production environment, errors are suppressed for security and user experience reasons.
+ * In other environments, all errors are displayed, aiding in development and debugging.
+ */
+$errorfile = dirname(__DIR__, 2) . cml_config('ERRORLOG_FILE');
+$production = cml_config('PRODUCTION');
 
-    // Turn off error reporting in production environment, enable otherwise
-    error_reporting($production ? 0 : E_ALL);
-    ini_set('display_errors', $production || (cml_config('CML_DEBUG') && !$production) ? 0 : 1);
+// Turn off error reporting in production environment, enable otherwise
+error_reporting($production ? 0 : E_ALL);
+ini_set('display_errors', $production || (cml_config('CML_DEBUG') && !$production) ? 0 : 1);
 
-    // If debug mode is enabled, set a custom error handler
-    if (cml_config('CML_DEBUG') && !$production) {
-        set_error_handler("customError");
-    } else {
-        // Turn off error reporting when not in debug mode
-        mysqli_report($production ? MYSQLI_REPORT_OFF : MYSQLI_REPORT_ERROR);
+// If debug mode is enabled, set a custom error handler
+if (cml_config('CML_DEBUG') && !$production) {
+    set_error_handler("customError");
+} else {
+    // Turn off error reporting when not in debug mode
+    mysqli_report($production ? MYSQLI_REPORT_OFF : MYSQLI_REPORT_ERROR);
+}
+
+ini_set('log_errors', 1);
+ini_set('error_log', $errorfile);
+
+/**
+ * Custom error handler function.
+ *
+ * @param int    $errno   The level of the error raised.
+ * @param string $errstr  The error message.
+ * @param string $errfile The filename that the error was raised in.
+ * @param int    $errline The line number the error was raised at.
+ */
+function customError($errno, $errstr, $errfile, $errline)
+{
+    global $errorfile;
+
+    $errorTypes = [
+        E_ERROR => 'Error',
+        E_USER_ERROR  => 'Error',
+        E_WARNING => 'Warning',
+        E_NOTICE => 'Notice',
+    ];
+
+    $errorTypeString = $errorTypes[$errno] ?? 'Unknown Error Type';
+    $id = substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 20);
+    $trace = debug_backtrace(2);
+    if (file_exists($errorfile)) {
+        error_log("[ID: {$id}] ", 3, $errorfile);
     }
 
-    ini_set('log_errors', 1);
-    ini_set('error_log', $errorfile);
+    if (IS_AJAX || defined('CLI')) {
+        http_response_code(500);
+        useTrait('startSession');
+        echo json_encode(
+            ['PHPError' => [
+                'errormessage' => htmlspecialchars($errstr),
+                'errorline' => $errline,
+                'errorfile' => $errfile,
+                'errortype' => $errorTypeString,
+                'id' => $id,
+                'date' => date('Y-m-d H:i:s'),
+                'cml-version' => useTrait("getFrameworkVersion"),
+                'php-version' => phpversion(),
+                'trace' => $trace,
+                'server-data' => [
+                    'server' => $_SERVER,
+                    'get' => $_GET,
+                    'post' => $_POST,
+                    'file' => $_FILES,
+                    'session' => $_SESSION,
+                    'env' => $_ENV,
+                    'cookie' => $_COOKIE,
+                    'http-status' => http_response_code(),
+                ]
+            ]],
+            JSON_PRETTY_PRINT
+        );
+        exit;
+    }
 
-    /**
-     * Custom error handler function.
-     *
-     * @param int    $errno   The level of the error raised.
-     * @param string $errstr  The error message.
-     * @param string $errfile The filename that the error was raised in.
-     * @param int    $errline The line number the error was raised at.
-     */
-    function customError($errno, $errstr, $errfile, $errline) {
-        global $errorfile;
-
-        $errorTypes = [
-            E_ERROR => 'Error',
-            E_USER_ERROR  => 'Error',
-            E_WARNING => 'Warning',
-            E_NOTICE => 'Notice',
-        ];
-    
-        $errorTypeString = $errorTypes[$errno] ?? 'Unknown Error Type';
-        $id = substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 20);
-        $trace = debug_backtrace(2);
-        if (file_exists($errorfile)){
-            error_log("[ID: {$id}] ", 3, $errorfile);
-        }
-
-        if(IS_AJAX || defined('CLI')){
-            http_response_code(500);
-            useTrait('startSession');
-            echo json_encode(
-                ['PHPError' => [
-                    'errormessage' => htmlspecialchars($errstr),
-                    'errorline' => $errline,
-                    'errorfile' => $errfile,
-                    'errortype' => $errorTypeString,
-                    'id' => $id,
-                    'date' => date('Y-m-d H:i:s'),
-                    'cml-version' => useTrait("getFrameworkVersion"),
-                    'php-version' => phpversion(),
-                    'trace' => $trace,
-                    'server-data' => [
-                        'server' => $_SERVER,
-                        'get' => $_GET, 
-                        'post' => $_POST, 
-                        'file' => $_FILES, 
-                        'session' => $_SESSION, 
-                        'env' => $_ENV, 
-                        'cookie' => $_COOKIE, 
-                        'http-status' => http_response_code(), 
-                    ]
-                ]]
-            , JSON_PRETTY_PRINT);
-            exit;
-        }
-        
-        ob_start();
-        echo "
+    ob_start();
+    echo "
         <script>
             function closeOverlayById(id) {
                 const overlay = document.querySelector('.' + id);
@@ -136,13 +138,13 @@
             <div class='error'>
                 <div class='error-info'>
                     <span class='error-type'>{$errorTypeString}</span>
-                    <h2 class='error-msg'>". htmlspecialchars($errstr) ."</h2>
+                    <h2 class='error-msg'>" . htmlspecialchars($errstr) . "</h2>
                     <span class='error-id'>Error-ID: {$id}</span> 
                 </div>
                 <div class='error-versions'>
                     <span>Date/Time: " . date('Y-m-d H:i:s') . "</span>
                     <span>CML Version: v" . useTrait("getFrameworkVersion") . "</span>
-                    <span>PHP ".phpversion()."</span>
+                    <span>PHP " . phpversion() . "</span>
                 </div>
             </div>
 
@@ -150,30 +152,30 @@
                 <div class='stack-trace'>
                     <h3>Stack Trace</h3>";
 
-                    // Loop through the stack trace and display relevant information
-                    $firstIteration = true;
-                    foreach ($trace as $item) {
-                        if (isset($item['file']) && isset($item['line'])) {
-                            echo "<div class='stack-trace-data'" . ($firstIteration ? ' style="background-color:#fd3a3a;color:white;"' : '') . ">";
-                            echo "<span><strong>File:</strong>" . getFilePath($item['file']) . "</span>";
-                            echo "<span><strong>Line:</strong> {$item['line']}</span>";
+    // Loop through the stack trace and display relevant information
+    $firstIteration = true;
+    foreach ($trace as $item) {
+        if (isset($item['file']) && isset($item['line'])) {
+            echo "<div class='stack-trace-data'" . ($firstIteration ? ' style="background-color:#fd3a3a;color:white;"' : '') . ">";
+            echo "<span><strong>File:</strong>" . getFilePath($item['file']) . "</span>";
+            echo "<span><strong>Line:</strong> {$item['line']}</span>";
 
-                            if (isset($item['args'])) {
-                                foreach ($item['args'] as $args) {
-                                    echo "<span><strong>{$item['function']}: </strong>" . basename($args);
-                                }
-                            } else {
-                                echo "<span><strong>Function:</strong> {$item['function']} ";
-                            }
+            if (isset($item['args'])) {
+                foreach ($item['args'] as $args) {
+                    echo "<span><strong>{$item['function']}: </strong>" . basename($args);
+                }
+            } else {
+                echo "<span><strong>Function:</strong> {$item['function']} ";
+            }
 
-                            echo "</div>";
-                            echo "<hr>";
+            echo "</div>";
+            echo "<hr>";
 
-                            $firstIteration = false;
-                        }
-                    }
+            $firstIteration = false;
+        }
+    }
 
-                echo "
+    echo "
                 </div>
 
                 <div class='file'>
@@ -182,38 +184,38 @@
                     </div>
                     <div class='file-content'>
                     <pre><code>";
-                    
-                    // Display code snippet around the error line
-                    $lines = file($errfile);
-                    $start = max(0, $errline - 10);
-                    $end = min(count($lines), $errline + 10);
-    
-                    for ($i = $start; $i < $end; $i++) {
-                        echo "<span style='background-color: " . ($i == $errline - 1 ? '#FEDBDA' : '') . ";'>"
-                            . ($i + 1) . ": "
-                            . htmlspecialchars($lines[$i])
-                            . "</span>";
-                    }
 
-                    echo "</code></pre>
+    // Display code snippet around the error line
+    $lines = file($errfile);
+    $start = max(0, $errline - 10);
+    $end = min(count($lines), $errline + 10);
+
+    for ($i = $start; $i < $end; $i++) {
+        echo "<span style='background-color: " . ($i == $errline - 1 ? '#FEDBDA' : '') . ";'>"
+            . ($i + 1) . ": "
+            . htmlspecialchars($lines[$i])
+            . "</span>";
+    }
+
+    echo "</code></pre>
                     </div>
                     <div class='all-infos'>
                     <hr>";
 
-                    // Display various tables with data (GET, POST, FILES, SESSION, ENV, COOKIE, etc.)
-                    generateTable($_GET, "Get Data");
-                    generateTable($_POST, "Post Data");
-                    generateTable($_FILES, "File Upload Data");
-                    useTrait('startSession');
-                    generateTable($_SESSION, "Session Data");
-                    generateTable($_ENV, "Environment Variables");
-                    generateTable($_COOKIE, "Cookie Data");
-                    
-                    generateTable(['HTTP Status' => http_response_code()], "HTTP Response");
-                    generateTable($_SERVER, "Server Data");
-                    generateTable(getallheaders(), "Header Information");
+    // Display various tables with data (GET, POST, FILES, SESSION, ENV, COOKIE, etc.)
+    generateTable($_GET, "Get Data");
+    generateTable($_POST, "Post Data");
+    generateTable($_FILES, "File Upload Data");
+    useTrait('startSession');
+    generateTable($_SESSION, "Session Data");
+    generateTable($_ENV, "Environment Variables");
+    generateTable($_COOKIE, "Cookie Data");
 
-                    echo "
+    generateTable(['HTTP Status' => http_response_code()], "HTTP Response");
+    generateTable($_SERVER, "Server Data");
+    generateTable(getallheaders(), "Header Information");
+
+    echo "
                     </div>
                 </div>
             </div>
@@ -221,51 +223,52 @@
     </div>";
     echo ob_get_clean();
     return false;
-    }
+}
 
-    /**
-     * Get relative file path from the document root.
-     *
-     * @param string $dir The absolute file path.
-     * @return string The relative file path.
-     */
-    function getFilePath(string $dir):string {
-        $documentRoot = str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']);
-        return str_replace($documentRoot, '', str_replace('\\', '/', $dir));
-    }
+/**
+ * Get relative file path from the document root.
+ *
+ * @param string $dir The absolute file path.
+ * @return string The relative file path.
+ */
+function getFilePath(string $dir): string
+{
+    $documentRoot = str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']);
+    return str_replace($documentRoot, '', str_replace('\\', '/', $dir));
+}
 
-    /**
-     * Generate a table for displaying key-value pairs.
-     *
-     * @param array  $data  The data to be displayed in the table.
-     * @param string $title The title of the table.
-     */
-    function generateTable(array $data, string $title) {
-        echo "<div class='table-container'>
+/**
+ * Generate a table for displaying key-value pairs.
+ *
+ * @param array  $data  The data to be displayed in the table.
+ * @param string $title The title of the table.
+ */
+function generateTable(array $data, string $title)
+{
+    echo "<div class='table-container'>
                 <div class='info-data'>
                 <h4>$title</h4>";
-        
-        if (empty($data)) {
-            echo "<span class='empty-data'>empty</span>
+
+    if (empty($data)) {
+        echo "<span class='empty-data'>empty</span>
             </div>";
-        } else {
-            echo "
+    } else {
+        echo "
             </div>
             <table class='info-table'>
                     <tr>
                         <th>Key</th>
                         <th>Value</th>
                     </tr>";
-    
-            foreach ($data as $key => $value) {
-                echo "<tr>
+
+        foreach ($data as $key => $value) {
+            echo "<tr>
                         <td>$key</td>
                         <td class='value'>$value</td>
                     </tr>";
-            }
-            echo "</table>";
         }
-    
-        echo "</div>";
+        echo "</table>";
     }
-?>
+
+    echo "</div>";
+}

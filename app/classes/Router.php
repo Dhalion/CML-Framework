@@ -1,4 +1,5 @@
 <?php
+
 namespace CML\Classes;
 
 /**
@@ -11,7 +12,8 @@ namespace CML\Classes;
  * @author CallMeLeon <kontakt@callmeleon.de>
  * @see https://docs.callmeleon.de/the-basics#Routing
  */
-class Router extends \CML\Classes\HTMLBuilder{
+class Router extends \CML\Classes\HTMLBuilder
+{
     use Functions\Functions;
     use Functions\Session;
 
@@ -77,7 +79,7 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @var array
      */
     public array $errorPage = [];
-    
+
     /**
      * Array of error page variables.
      *
@@ -105,7 +107,7 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @var string
      */
     public string $sitesPath = "";
-    
+
     /**
      * Stores the named routes with their corresponding URLs.
      *
@@ -125,7 +127,8 @@ class Router extends \CML\Classes\HTMLBuilder{
      * Constructor method for the Router class.
      * Merges the $_GET superglobal array with the query parameters obtained from the getQueryParams() method.
      */
-    public function __construct(){
+    public function __construct()
+    {
         $this->sitesPath = cml_config('SITES_PATH');
         $_GET = array_merge($_GET, $this->getQueryParams());
     }
@@ -133,7 +136,8 @@ class Router extends \CML\Classes\HTMLBuilder{
     /**
      * Match the defined routes.
      */
-    public function __destruct() {
+    public function __destruct()
+    {
         $this->_matchRoute();
     }
 
@@ -142,7 +146,8 @@ class Router extends \CML\Classes\HTMLBuilder{
      *
      * @return bool
      */
-    public function isApi():bool{
+    public function isApi(): bool
+    {
         self::setHeader('Content-Type', 'application/json');
         return $this->isApi = true;
     }
@@ -152,13 +157,14 @@ class Router extends \CML\Classes\HTMLBuilder{
      *
      * @return array An array containing all defined routes.
      */
-    public function getAllRoutes(): array {
+    public function getAllRoutes(): array
+    {
         $allRoutes = [];
         foreach ($this->routes as $method => $routes) {
             foreach ($routes as $url => $route) {
                 $allRoutes[] = [
-                    'method' => $method, 
-                    'url' => $url, 
+                    'method' => $method,
+                    'url' => $url,
                     'name' => $route['name'],
                     'meta' => $this->meta(null, $url),
                 ];
@@ -176,10 +182,11 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param mixed $paramName The name of the route parameter to retrieve. (optional)
      * @return mixed|array|null The value of the specified route parameter, an array of all route parameters, or null if the parameter is not found.
      */
-    public function getRouteParam($paramName = null) {
+    public function getRouteParam($paramName = null)
+    {
         if (is_null($paramName)) {
             // Return all current route parameters
-            return $this->currentRouteParams; 
+            return $this->currentRouteParams;
         } else {
             // Return the value of the specified route parameter or null if not found
             return isset($this->currentRouteParams[$paramName]) ? $this->currentRouteParams[$paramName] : null;
@@ -192,7 +199,8 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param string $url The URL for the route
      * @param string $method The HTTP method (e.g., "GET" or "POST")
      */
-    private function handleRouteNotFound(string $url, string $method) {
+    private function handleRouteNotFound(string $url, string $method)
+    {
         self::setHeader("HTTP/1.1 404 Not Found");
         trigger_error("Route not found for URL: '$url' (Method: $method)", E_USER_ERROR);
     }
@@ -202,7 +210,8 @@ class Router extends \CML\Classes\HTMLBuilder{
      *
      * @param string $url The URL for the redirect
      */
-    public function setErrorRedirect(string $url){
+    public function setErrorRedirect(string $url)
+    {
         $this->redirectUrl = parent::assetUrl($url);
     }
 
@@ -211,13 +220,14 @@ class Router extends \CML\Classes\HTMLBuilder{
      *
      * @param string $siteName The name of the desired file.
      */
-    public function setErrorPage(string $siteName, array $variables = [], string $htmlTitle = "404 - Not Found"){
-        if (file_exists(self::getRootPath($this->sitesPath.$siteName))) {
+    public function setErrorPage(string $siteName, array $variables = [], string $htmlTitle = "404 - Not Found")
+    {
+        if (file_exists(self::getRootPath($this->sitesPath . $siteName))) {
             $this->errorPage['page'] = $siteName;
             $this->errorPage['title'] = $htmlTitle;
             $this->errorPageVariables = $variables;
         } else {
-            return trigger_error(htmlentities("Could not find the file $this->sitesPath"."$siteName", E_USER_ERROR));
+            return trigger_error(htmlentities("Could not find the file $this->sitesPath" . "$siteName", E_USER_ERROR));
         }
     }
 
@@ -227,7 +237,8 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param array $urls An array of URLs for the redirect
      * @param Closure $gloMiddleware
      */
-    public function addGlobalMiddleware(array $urls, \Closure $gloMiddleware){
+    public function addGlobalMiddleware(array $urls, \Closure $gloMiddleware)
+    {
         $this->globalMiddleware['function'][] = $gloMiddleware;
         foreach ($urls as $url) {
             $this->globalMiddleware['url'][] = $url;
@@ -241,7 +252,8 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param string $position The position (before or after)
      * @return $this
      */
-    public function addMiddleware(\Closure $middleware, string $position = "before") {
+    public function addMiddleware(\Closure $middleware, string $position = "before")
+    {
         $this->middlewares["function"][] = $middleware;
         $this->middlewares["route"][] = $this->currentRoute;
         $this->middlewares["position"][] = $position;
@@ -257,7 +269,8 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param string $name The name for the route
      * @return object
      */
-    public function addRoute($methods, string $url, \Closure $target, string $name = '') {
+    public function addRoute($methods, string $url, \Closure $target, string $name = '')
+    {
         $methods = (is_array($methods)) ? $methods : [$methods]; // Convert to an array if it's a single method
         $this->currentRoute = $url;
 
@@ -274,7 +287,7 @@ class Router extends \CML\Classes\HTMLBuilder{
             }
         }
 
-        global $cml_namedRoutes; 
+        global $cml_namedRoutes;
         $cml_namedRoutes = $this->namedRoutes;
 
         return $this;
@@ -288,23 +301,24 @@ class Router extends \CML\Classes\HTMLBuilder{
      *                        If an array, sets the entire metadata array.
      * @return mixed The requested metadata or null if not found.
      */
-    public function meta($metadata = null, string $routeUrl = '') {
+    public function meta($metadata = null, string $routeUrl = '')
+    {
         if (empty($routeUrl)) {
             $routeUrl = $this->currentRoute;
         }
-    
+
         if (is_null($metadata)) {
             return $this->routeMetadata[$routeUrl] ?? null;
         }
-    
+
         if (is_array($metadata) && !empty($metadata)) {
             return $this->routeMetadata[$routeUrl] = $metadata;
         }
-    
+
         if (is_string($metadata) && !empty($metadata) && isset($this->routeMetadata[$routeUrl][$metadata])) {
             return $this->routeMetadata[$routeUrl][$metadata];
         }
-    
+
         return null;
     }
 
@@ -314,9 +328,10 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param string|null $url The URL of the specific route to retrieve metadata for. If null, retrieves metadata for all routes.
      * @return null|array The metadata for the routes. The keys are the route URLs and the values are the corresponding metadata.
      */
-    public function allMetas(string $url = null): ?array {
+    public function allMetas(string $url = null): ?array
+    {
         $metadata = [];
-    
+
         if ($url) {
             $metadata[$url] = $this->meta(null, $url);
         } else {
@@ -325,7 +340,7 @@ class Router extends \CML\Classes\HTMLBuilder{
                 $metadata[$data["url"]] = $this->meta(null, $data["url"]);
             }
         }
-    
+
         return $metadata;
     }
 
@@ -336,7 +351,8 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param array $parameters Associative array of parameter values to replace placeholders
      * @return string|null The URL for the named route with replaced placeholders or null if not found
      */
-    public function getNamedRouteUrl(string $name, array $parameters = []): ?string {
+    public function getNamedRouteUrl(string $name, array $parameters = []): ?string
+    {
         if (isset($this->namedRoutes[$name])) {
             $url = $this->namedRoutes[$name];
 
@@ -349,7 +365,7 @@ class Router extends \CML\Classes\HTMLBuilder{
         }
         return null;
     }
-    
+
     /**
      * Sets a "where" condition for the current route.
      *
@@ -357,7 +373,8 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param string $condition The regular expression condition for the parameter.
      * @return $this The router instance for method chaining.
      */
-    public function where(string $param, string $condition) {
+    public function where(string $param, string $condition)
+    {
         if (!empty($this->currentRoute)) {
             $this->routes[$this->currentMethod][$this->currentRoute]['where'] = [$param => $condition];
         }
@@ -372,7 +389,8 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param array $in The array of values to check against for the "where in" condition.
      * @return $this The current instance of the Router class.
      */
-    public function whereIn(string $param, array $in) {
+    public function whereIn(string $param, array $in)
+    {
         if (!empty($this->currentRoute)) {
             $this->routes[$this->currentMethod][$this->currentRoute]['whereIn'] = [$param => $in];
         }
@@ -390,7 +408,8 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param Closure $callback A function that defines the specific routes for this group and adds them to the router.
      * @return object
      */
-    public function addGroup(string $prefix, \Closure $callback) {
+    public function addGroup(string $prefix, \Closure $callback)
+    {
         // Backup current middlewares
         $originalMiddlewares = $this->middlewares;
 
@@ -409,24 +428,29 @@ class Router extends \CML\Classes\HTMLBuilder{
     /**
      * Compares the requested method and URL to defined routes, processes them, and throws an exception if no match is found.
      */
-    protected function _matchRoute() {
+    protected function _matchRoute()
+    {
 
         # URL Validation
         $url = $_SERVER['REQUEST_URI']; // Get the URL from the current page
-        if ($url != "/") {$url = rtrim($_SERVER['REQUEST_URI'], '/');} // Remove slash from the end
+        if ($url != "/") {
+            $url = rtrim($_SERVER['REQUEST_URI'], '/');
+        } // Remove slash from the end
         $url = strtok($url, '?'); // Remove query parameters from the URL
         $url = str_replace(ltrim(rtrim(parent::assetUrl(""), "/"), "/"), "", $url); // Add the basename of the application folder
-        if ($url == "/index.php") { $url = "/";} // Check if the URL is "index.php" and redirect to the root route
+        if ($url == "/index.php") {
+            $url = "/";
+        } // Check if the URL is "index.php" and redirect to the root route
         $url = str_replace("//", "/", $url); // Remove double slashes from the URL
         $this->currentUrl = $url;
 
         // Clear current site cache and preload ist
-        if($this->cacheEnabled && isset($_GET[$this->cacheOptions['config']['clearCurrent']])) {
+        if ($this->cacheEnabled && isset($_GET[$this->cacheOptions['config']['clearCurrent']])) {
             $this->purgeCache($url);
         }
 
         // Clear all cache
-        if($this->cacheEnabled && isset($_GET[$this->cacheOptions['config']['clearAll']])) {
+        if ($this->cacheEnabled && isset($_GET[$this->cacheOptions['config']['clearAll']])) {
             $this->purgeAll();
         }
 
@@ -472,9 +496,10 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param string $url The route URL
      * @param array $routes Routes with the appropriate action
      */
-    protected function _processRoutes(string $url, array $routes) {
+    protected function _processRoutes(string $url, array $routes)
+    {
         // Sort the routes by the number of parameters in descending order
-        uksort($routes, fn($key1, $key2) => (strpos($key1, ':') !== false ? 1 : 0) - (strpos($key2, ':') !== false ? 1 : 0));
+        uksort($routes, fn ($key1, $key2) => (strpos($key1, ':') !== false ? 1 : 0) - (strpos($key2, ':') !== false ? 1 : 0));
 
         foreach ($routes as $routeUrl => $routeData) {
             // Check if the current route is restricted to AJAX requests
@@ -482,15 +507,15 @@ class Router extends \CML\Classes\HTMLBuilder{
                 http_response_code(403);
                 continue; // Skip this route if it's not an AJAX request
             }
-    
+
             // Convert route URL to a regular expression pattern for ':' parameters
             $pattern = preg_replace('/\/:([^\/]+)/', '/(?P<$1>[^/]+)', $routeUrl);
-    
+
             // Check if the current URL matches the pattern
             if (preg_match('#^' . $pattern . '$#', $url, $matches)) {
 
                 // Check "whereIn" conditions
-                if(!empty($routeData['whereIn']) && $this->_checkWhereIn($matches, $routeData['whereIn'])) {
+                if (!empty($routeData['whereIn']) && $this->_checkWhereIn($matches, $routeData['whereIn'])) {
                     return false;
                 }
 
@@ -518,10 +543,10 @@ class Router extends \CML\Classes\HTMLBuilder{
 
                 // Close the application
                 (!$this->isApi && !$routeData['ajaxOnly']) ? $this->buildHTML(ob_get_clean()) : exit;
-            } 
+            }
         }
     }
-    
+
     /**
      * Check if parameter values meet the specified "where" conditions.
      *
@@ -530,7 +555,8 @@ class Router extends \CML\Classes\HTMLBuilder{
      *
      * @return bool True if all conditions are met, false otherwise.
      */
-    protected function _checkWhereConditions(array $parameterValues, array $whereConditions):bool {
+    protected function _checkWhereConditions(array $parameterValues, array $whereConditions): bool
+    {
         foreach ($whereConditions as $paramName => $condition) {
             if (isset($parameterValues[$paramName]) && !preg_match($condition, $parameterValues[$paramName])) {
                 return false;
@@ -538,7 +564,7 @@ class Router extends \CML\Classes\HTMLBuilder{
         }
         return true;
     }
-    
+
     /**
      * Checks if the parameter values satisfy the given where conditions.
      *
@@ -546,7 +572,8 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param array $whereConditions The where conditions to satisfy.
      * @return bool Returns true if the parameter values satisfy the where conditions, false otherwise.
      */
-    protected function _checkWhereIn(array $parameterValues, array $whereConditions): bool {
+    protected function _checkWhereIn(array $parameterValues, array $whereConditions): bool
+    {
         foreach ($whereConditions as $paramName => $conditions) {
             if (isset($parameterValues[$paramName]) && in_array($parameterValues[$paramName], $conditions)) {
                 return false;
@@ -562,7 +589,8 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param string $position The position of the middleware (before or after)
      * @param string $url The URL for which the middleware should be executed
      */
-    protected function _executeMiddleware(string $position, string $url) {
+    protected function _executeMiddleware(string $position, string $url)
+    {
         if (!empty($this->middlewares)) {
             $mdPosition = array_search($url, $this->middlewares["route"]);
             if (is_int($mdPosition) && $this->middlewares['position'][$mdPosition] === $position) {
@@ -579,7 +607,8 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param array $variables An optional array of variables to be extracted and made available to the included file.
      * @return string The captured output of the included file.
      */
-    protected function _processFile(string $sitePath, array $variables = []): string {
+    protected function _processFile(string $sitePath, array $variables = []): string
+    {
         if (!file_exists($sitePath)) {
             trigger_error(htmlentities("'$sitePath' | Site not found"), E_USER_ERROR);
             return '';
@@ -598,11 +627,12 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param array $variables An optional array of variables to pass to the view.
      * @return void
      */
-    public function view(string $siteName, array $variables = []) {
+    public function view(string $siteName, array $variables = [])
+    {
         $sitePath = self::getRootPath($this->sitesPath . $siteName);
         $content = $this->_processFile($sitePath, $variables);
 
-        $content = preg_replace_callback('/<(\w+)([^>]*)>([\s\S]*?)<\/\1>|<(\w+)([^>]*)>/', function($matches) {
+        $content = preg_replace_callback('/<(\w+)([^>]*)>([\s\S]*?)<\/\1>|<(\w+)([^>]*)>/', function ($matches) {
             $tag = $matches[4] ?? $matches[1];
             $attributes = $matches[5] ?? $matches[2];
             $slot = $matches[3] ?? null;
@@ -632,7 +662,7 @@ class Router extends \CML\Classes\HTMLBuilder{
                 return $matches[0];
             }
         }, $content);
-        
+
         echo $content;
     }
 
@@ -642,21 +672,23 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param string $siteName The name of the desired file.
      * @param array $variables An associative array of variables to be made available in the loaded file.
      */
-    public function getSite(string $siteName, array $variables = []) {
+    public function getSite(string $siteName, array $variables = [])
+    {
         $sitePath = self::getRootPath($this->sitesPath . $siteName);
         $content = $this->_processFile($sitePath, $variables);
 
         echo $content;
     }
 
-    
+
 
     /**
      * Set the route to be accessible only via AJAX requests.
      *
      * @return $this
      */
-    public function onlyAjax() {
+    public function onlyAjax()
+    {
         if (!empty($this->currentRoute)) {
             $this->routes[$this->currentMethod][$this->currentRoute]['ajaxOnly'] = true;
         }
@@ -670,7 +702,8 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param string $alias The alias URL
      * @return Router This router instance
      */
-    public function setAlias(string $alias) {
+    public function setAlias(string $alias)
+    {
         if (!empty($this->currentRoute)) {
             $this->aliases[$alias] = $this->currentRoute;
         }
@@ -684,7 +717,8 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param string $alias The alias URL
      * @return string|null The original URL if found, null otherwise
      */
-    protected function _findOriginalUrlForAlias(string $alias) {
+    protected function _findOriginalUrlForAlias(string $alias)
+    {
         return $this->aliases[$alias] ?? null;
     }
 
@@ -694,7 +728,8 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param array $inputArray The array of strings to sanitize.
      * @return array The sanitized array.
      */
-    protected function _sanitizeStringsArray(array $inputArray): array {
+    protected function _sanitizeStringsArray(array $inputArray): array
+    {
         $sanitizedArray = [];
 
         foreach ($inputArray as $k => $input) {

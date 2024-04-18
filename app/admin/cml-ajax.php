@@ -18,7 +18,7 @@ if (empty($action)) {
  * Checks if the specified action is registered for an Ajax call.
  * If the action is not registered, it sets the HTTP response code to 403 and terminates the script execution.
  */
-if(!in_array($action, $cml_ajax_functions)){
+if (!in_array($action, $cml_ajax_functions)) {
     http_response_code(403);
     die('This action is not registered for an Ajax call.');
 }
@@ -37,4 +37,3 @@ try {
     http_response_code(500);
     die("Internal server error");
 }
-?>
