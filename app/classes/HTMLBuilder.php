@@ -694,7 +694,7 @@ abstract class HTMLBuilder extends Cache
     {
         if ($this->cacheEnabled === true) {
             $cachedContent = $this->getCache($cacheKey);
-            if ($cachedContent !== false && cml_config('PRODUCTION') !== true) {
+            if ($cachedContent !== false && cml_config('PRODUCTION') !== false) {
                 echo $cachedContent;
                 exit;
             }
