@@ -1,10 +1,16 @@
 <?php
 
 /**
+ * Starts the timer to measure the execution time.
+ */
+$cml_script_start = microtime(true);
+
+/**
  * Loads the Composer autoloader.
  */
 if (file_exists($autoloadPath = dirname(__DIR__, 2) . '/vendor/autoload.php')) {
     require_once $autoloadPath;
+    unset($autoloadPath);
 } else {
     die('Composer vendor is not installed.');
 }
@@ -15,6 +21,8 @@ if (file_exists($autoloadPath = dirname(__DIR__, 2) . '/vendor/autoload.php')) {
  */
 if (file_exists($configPath = dirname(__DIR__) . '/config/cml-config.php')) {
     require_once $configPath;
+    unset($configPath);
+
     define('IS_AJAX', !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest');
     define('BASE_URL', (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . "://" . $_SERVER['HTTP_HOST'] . str_replace($_SERVER['DOCUMENT_ROOT'], '', rtrim(dirname($_SERVER['SCRIPT_FILENAME'], IS_AJAX ? 3 : 1), '/\\')) . "/");
 } else {
@@ -23,10 +31,19 @@ if (file_exists($configPath = dirname(__DIR__) . '/config/cml-config.php')) {
 }
 
 /**
+ * Loads framework variables from cml-vars.php
+ */
+if (file_exists($cml_vars = __DIR__ . '/cml-vars.php')) {
+    require_once $cml_vars;
+    unset($cml_vars);
+}
+
+/**
  * Loads framework functions from cml-functions.php
  */
 if (file_exists($cml_functions = __DIR__ . '/cml-functions.php')) {
     require_once $cml_functions;
+    unset($cml_functions);
 }
 
 /**
@@ -34,6 +51,7 @@ if (file_exists($cml_functions = __DIR__ . '/cml-functions.php')) {
  */
 if (file_exists($handler = __DIR__ . '/cml-error.php')) {
     require_once $handler;
+    unset($handler);
 }
 
 /**
@@ -41,6 +59,7 @@ if (file_exists($handler = __DIR__ . '/cml-error.php')) {
  */
 if (file_exists($functions = dirname(__DIR__, 2) . '/functions.php')) {
     require_once $functions;
+    unset($functions);
 }
 
 header('X-Powered-By: CML-Framework/' .  useTrait()::getFrameworkVersion() . " - PHP/" . phpversion());

@@ -25,7 +25,6 @@ function useTrait(string $functionName = "", ...$parameters)
  * This function allows you to register one or more functions to be called via AJAX.
  * The registered functions will be stored in the global variable $cml_ajax_functions.
  */
-$cml_ajax_functions = array();
 function ajax(...$function)
 {
     global $cml_ajax_functions;
@@ -39,7 +38,6 @@ function ajax(...$function)
  * @param mixed $config (optional) The configuration key or an array of key-value pairs to set.
  * @return mixed The CML configuration values if no parameter is provided, or the value of the specified configuration key.
  */
-$cml_config = get_defined_constants(true)['user'];
 function cml_config($config = null)
 {
     global $cml_config;
