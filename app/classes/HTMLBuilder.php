@@ -919,13 +919,13 @@ abstract class HTMLBuilder extends Cache
                 .infoBox table {
                     width: 100%;
                     border-collapse: collapse;
-                    font-size: 14px;
+                    font-size: 13px;
                     color: #fff;
                 }
 
                 .infoBox th,
                 .infoBox td {
-                    padding: 12px;
+                    padding: 10px;
                     text-align: left;
                     border-bottom: 1px solid #444;
                 }
@@ -955,6 +955,15 @@ abstract class HTMLBuilder extends Cache
                 .infoBox th:last-child,
                 .infoBox td:last-child {
                     border-right: none;
+                }
+
+                .infoBox::-webkit-scrollbar {
+                    width: 6px;
+                }
+
+                .infoBox::-webkit-scrollbar-thumb {
+                    background-color: #888;
+                    border-radius: 4px;
                 }
             </style>
         <?php
@@ -988,7 +997,6 @@ abstract class HTMLBuilder extends Cache
                             }
                         });
                     });
-
 
                     document.querySelector('.cmlBarClose').addEventListener('click', () => {
                         document.getElementById('cmlInfoBar').style.display = 'none';
@@ -1027,6 +1035,9 @@ abstract class HTMLBuilder extends Cache
         $table .= '<thead><tr><th>Name</th><th>Value</th></tr></thead>';
         $table .= '<tbody>';
         foreach ($data as $name => $value) {
+            if (is_bool($value)) {
+                $value = $value ? 'true' : 'false';
+            }
             $table .= "<tr><td>$name</td><td>$value</td></tr>";
         }
         $table .= '</tbody></table>';
