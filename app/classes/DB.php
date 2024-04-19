@@ -102,6 +102,25 @@ class DB
     }
 
     /**
+     * Retrieves the file and line number where a specific function is called from.
+     *
+     * @param string $functionName The name of the function to trace.
+     * @return array|null An array containing the file and line number where the function is called from,
+     *                    or null if the function is not found in the call stack.
+     */
+    protected function _traceFunctionCalls(string $functionName): ?array
+    {
+        $trace = debug_backtrace();
+        foreach ($trace as $caller) {
+            if (isset($caller['function']) && $caller['function'] === $functionName && isset($caller['file'])) {
+                $file = str_replace(rtrim(self::getRootPath(), "/"), '', $caller['file']);
+                $line = $caller['line'];
+                return ['file' => $file, 'line' => $line];
+            }
+        }
+    }
+
+    /**
      * Executes an SQL query and returns the result as an array.
      *
      * @param string $query The SQL query.
@@ -161,8 +180,10 @@ class DB
             throw new Exception("SQL Error: " . $stmt->error);
         }
 
+        $callData = $this->_traceFunctionCalls('sql2array');
+
         $this->cml_db_update_amount();
-        $this->cml_db_update_request_query(['query' => $query, 'params' => $params]);
+        $this->cml_db_update_request_query(array_merge(['query' => $query, 'params' => $params], $callData));
 
         $stmt->close();
         return $sqlArray;
@@ -259,9 +280,10 @@ class DB
 
         $stmt->execute();
         $affectedRows = $stmt->affected_rows;
+        $callData = $this->_traceFunctionCalls('sql2db');
 
         $this->cml_db_update_amount();
-        $this->cml_db_update_request_query(['query' => $query, 'params' => $params, 'affected_rows' => $affectedRows]);
+        $this->cml_db_update_request_query(array_merge(['query' => $query, 'params' => $params, 'affected_rows' => $affectedRows], $callData));
 
         $stmt->close();
         return $affectedRows;
