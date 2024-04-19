@@ -150,6 +150,8 @@ trait Functions
         if (class_exists($controllerClassName)) {
             $controllerInstance = new $controllerClassName();
             if (method_exists($controllerInstance, $methodName)) {
+                global $cml_used_controller;
+                $cml_used_controller[] = ['method' => $methodName, 'controller' => $controllerClassName];
                 return call_user_func([$controllerInstance, $methodName], $params);
             } else {
                 trigger_error("Method $methodName not found in controller $controllerName.", E_USER_WARNING);

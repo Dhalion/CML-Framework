@@ -8,6 +8,13 @@
 $cml_ajax_functions = array();
 
 /**
+ * Store an array of used controllers in the CML framework.
+ * 
+ * @var array 
+ */
+$cml_used_controller = array();
+
+/**
  * Array to store CML configuration constants.
  *
  * @var array
