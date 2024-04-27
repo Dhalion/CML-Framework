@@ -1,11 +1,11 @@
 <?php
 require_once 'app/admin/cml-load.php';
 
-use CML\Classes\Router;
+use CML\Classes\Router as App;
 use CML\Classes\DB;
 
 $db = new DB(false);
-$app = new Router();
+$app = new App();
 
 //Project settings
 $app->activateMinifyHTML();
