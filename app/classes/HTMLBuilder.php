@@ -1048,13 +1048,13 @@ abstract class HTMLBuilder extends Cache
     private function _generateDBTable(array $data)
     {
         $table = '<table>';
-        $table .= '<thead><tr><th>Order</th><th>Query</th><th>Params</th><th>Affected Rows</th><th>File</th></tr></thead>';
+        $table .= '<thead><tr><th>Order</th><th>Time</th><th>Query</th><th>Params</th><th>Affected Rows</th><th>File</th></tr></thead>';
         $table .= '<tbody>';
         $index = 1;
         foreach ($data as $item) {
             $query = htmlspecialchars($item['query']);
             $params = htmlspecialchars(implode(", ", $item['params']));
-            $table .= "<tr><td>$index</td><td>$query</td><td>$params</td><td>" . (isset($item['affected_rows']) ? $item['affected_rows'] : '') . "</td><td>$item[file]:$item[line]</td></tr>";
+            $table .= "<tr><td>$index</td><td>$item[executionTime]</td><td>$query</td><td>$params</td><td>" . (isset($item['affected_rows']) ? $item['affected_rows'] : '') . "</td><td>$item[file]:$item[line]</td></tr>";
             $index++;
         }
         $table .= '</tbody></table>';
