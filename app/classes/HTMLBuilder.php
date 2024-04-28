@@ -17,13 +17,44 @@ abstract class HTMLBuilder extends Cache
 {
     use Functions\Functions;
 
+    /**
+     * Represents a position before the `<head>` tag in an HTML document.
+     */
     const BEFORE_HEAD = 'before_head';
+
+    /**
+     * Represents a position at the top of the `<head>` tag in an HTML document.
+     */
     const TOP_HEAD = 'top_head';
+
+    /**
+     * Represents a position at the bottom of the `<head>` tag in an HTML document.
+     */
     const BOTTOM_HEAD = 'bottom_head';
+
+    /**
+     * Represents a position after the `<head>` tag in an HTML document.
+     */
     const AFTER_HEAD = 'after_head';
+
+    /**
+     * Represents a position before the `<body>` tag in an HTML document.
+     */
     const BEFORE_BODY = 'before_body';
+
+    /**
+     * Represents a position at the top of the `<body>` tag in an HTML document.
+     */
     const TOP_BODY = 'top_body';
+
+    /**
+     * Represents a position at the bottom of the `<body>` tag in an HTML document.
+     */
     const BOTTOM_BODY = 'bottom_body';
+
+    /**
+     * Represents a position after the `<body>` tag in an HTML document.
+     */
     const AFTER_BODY = 'after_body';
 
     /**
