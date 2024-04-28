@@ -8,7 +8,7 @@
  *
  * @return mixed The result of the method call, or an instance of the class with the traits if no method name is provided.
  */
-function useTrait(string $functionName = "", ...$parameters)
+function useTrait(string $functionName = "", ...$parameters): object
 {
     $class = new class
     {
@@ -35,10 +35,10 @@ function ajax(...$function)
 /**
  * Retrieves or sets the CML configuration values.
  *
- * @param mixed $config (optional) The configuration key or an array of key-value pairs to set.
+ * @param mixed|null $config (optional) The configuration key or an array of key-value pairs to set.
  * @return mixed The CML configuration values if no parameter is provided, or the value of the specified configuration key.
  */
-function cml_config($config = null)
+function cml_config(mixed $config = null): mixed
 {
     global $cml_config;
 
