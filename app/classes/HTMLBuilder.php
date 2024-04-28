@@ -818,7 +818,7 @@ abstract class HTMLBuilder extends Cache
                                 <td>Used Controller</td>
                                 <td>
                                     <?php foreach ($cml_used_controller as $item) : ?>
-                                        <?= $item['controller'] ?>:<?= $item['method'] ?> <br>
+                                        <?= $item['controller'] ?>::<?= $item['method'] ?> <br>
                                     <?php endforeach; ?>
                                 </td>
                             </tr>
