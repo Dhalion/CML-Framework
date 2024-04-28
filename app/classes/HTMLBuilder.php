@@ -388,6 +388,7 @@ abstract class HTMLBuilder extends Cache
      */
     public function setHook(string $customHookName)
     {
+        $this->regHooks[$customHookName];
         echo $this->_getHookContent($customHookName);
     }
 
