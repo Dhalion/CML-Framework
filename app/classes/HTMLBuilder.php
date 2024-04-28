@@ -244,6 +244,16 @@ abstract class HTMLBuilder extends Cache
     }
 
     /**
+     * Returns all registered hooks.
+     *
+     * @return array The array of registered hooks.
+     */
+    public function getAllHooks()
+    {
+        return $this->regHooks;
+    }
+
+    /**
      * Set HTML tag attributes for the document.
      *
      * @param string $attr The HTML tag attributes to be added.
@@ -388,7 +398,15 @@ abstract class HTMLBuilder extends Cache
      */
     public function setHook(string $customHookName)
     {
-        $this->regHooks[$customHookName];
+        $trace = debug_backtrace();
+        foreach ($trace as $caller) {
+            if (isset($caller['function']) && $caller['function'] === 'setHook' && isset($caller['file'])) {
+                $file = str_replace(rtrim(self::getRootPath(), "/"), '', $caller['file']);
+                $line = $caller['line'];
+            }
+        }
+
+        $this->regHooks['user_hooks'][] = ['name' => $customHookName, 'file' => $file, 'line' => $line];
         echo $this->_getHookContent($customHookName);
     }
 
