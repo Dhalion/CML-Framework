@@ -8,7 +8,7 @@
  *
  * @return mixed The result of the method call, or an instance of the class with the traits if no method name is provided.
  */
-function useTrait(string $functionName = "", ...$parameters): object
+function useTrait(string $functionName = "", ...$parameters): mixed
 {
     $class = new class
     {
