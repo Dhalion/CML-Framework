@@ -107,6 +107,8 @@ abstract class HTMLBuilder extends Cache
      */
     private string $charsetAttr = "UTF-8";
 
+    private array $customBarElements = [];
+
     /**
      * @var string Stores the currently url.
      */
@@ -814,6 +816,32 @@ abstract class HTMLBuilder extends Cache
         exit;
     }
 
+    /**
+     * Adds a bar element to the HTMLBuilder.
+     *
+     * @param string $text The text content of the bar element.
+     * @param string $hoverContent The hover content to be displayed when the bar element is hovered (optional).
+     * @param string $customClass The custom CSS class to be applied to the bar element (optional).
+     * @return void
+     */
+    public function addBarElement(string $text, string $hoverContent = "", string $customClass = "")
+    {
+        ob_start();
+        ?>
+        <div class="<?= ($hoverContent ? 'info-item ' : '') . $customClass ?>">
+            <?= $text ?>
+            <?php if ($hoverContent) : ?>
+                <div class="infoBox">
+                    <?= $hoverContent ?>
+                </div>
+            <?php endif; ?>
+        </div>
+    <?php
+        $customElement = ob_get_clean();
+        $this->customBarElements[] = $customElement;
+    }
+
+
     public function renderInfoBar()
     {
         global $cml_script_start, $cml_db_request_amount, $cml_db_request_query, $cml_used_controller;
@@ -822,7 +850,7 @@ abstract class HTMLBuilder extends Cache
         $type = strpos($this->currentRouteName, '/') !== false ? '' : '@';
         $httpResponseRange = (string) http_response_code();
         ob_start();
-        ?>
+    ?>
         <div id="cmlInfoBar">
             <div class="cmlBarBegin">
                 <div><?= $_SERVER['REQUEST_METHOD'] ?></div>
@@ -836,7 +864,7 @@ abstract class HTMLBuilder extends Cache
                                 <td>Used Controller</td>
                                 <td>
                                     <?php foreach ($cml_used_controller as $item) : ?>
-                                        <?= $item['controller'] ?>:<?= $item['method'] ?> <br>
+                                        <?= $item['controller'] ?>::<?= $item['method'] ?> <br>
                                     <?php endforeach; ?>
                                 </td>
                             </tr>
@@ -860,6 +888,9 @@ abstract class HTMLBuilder extends Cache
                         </div>
                     </div>
                 </div>
+                <?php foreach ($this->customBarElements as $element) : ?>
+                    <?= $element ?>
+                <?php endforeach; ?>
             </div>
 
             <div class="cmlBarEnd">
@@ -1066,13 +1097,13 @@ abstract class HTMLBuilder extends Cache
     private function _generateDBTable(array $data)
     {
         $table = '<table>';
-        $table .= '<thead><tr><th>Order</th><th>Query</th><th>Params</th><th>Affected Rows</th><th>File</th></tr></thead>';
+        $table .= '<thead><tr><th>Order</th><th>Time</th><th>Query</th><th>Params</th><th>Affected Rows</th><th>File</th></tr></thead>';
         $table .= '<tbody>';
         $index = 1;
         foreach ($data as $item) {
             $query = htmlspecialchars($item['query']);
             $params = htmlspecialchars(implode(", ", $item['params']));
-            $table .= "<tr><td>$index</td><td>$query</td><td>$params</td><td>" . (isset($item['affected_rows']) ? $item['affected_rows'] : '') . "</td><td>$item[file]:$item[line]</td></tr>";
+            $table .= "<tr><td>$index</td><td>$item[executionTime]</td><td>$query</td><td>$params</td><td>" . (isset($item['affected_rows']) ? $item['affected_rows'] : '') . "</td><td>$item[file]:$item[line]</td></tr>";
             $index++;
         }
         $table .= '</tbody></table>';

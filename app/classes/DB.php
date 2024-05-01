@@ -164,6 +164,7 @@ class DB
             call_user_func_array(array($stmt, 'bind_param'), $this->refValues($values));
         }
 
+        $startTime = microtime(true);
         $stmt->execute();
 
         $result = $stmt->get_result();
@@ -179,11 +180,13 @@ class DB
         } else {
             throw new Exception("SQL Error: " . $stmt->error);
         }
+        $executionTime = microtime(true) - $startTime;
+        $executionTime = round($executionTime < 1 ? $executionTime * 1000 : $executionTime, $executionTime < 1 ? 0 : 2) . ($executionTime < 1 ? ' ms' : ' s');
 
         $callData = $this->_traceFunctionCalls('sql2array');
 
         $this->cml_db_update_amount();
-        $this->cml_db_update_request_query(array_merge(['query' => $query, 'params' => $params], $callData));
+        $this->cml_db_update_request_query(array_merge(['query' => $query, 'params' => $params, 'executionTime' => $executionTime], $callData));
 
         $stmt->close();
         return $sqlArray;
@@ -278,12 +281,16 @@ class DB
             call_user_func_array(array($stmt, 'bind_param'), $this->refValues($values));
         }
 
+        $startTime = microtime(true);
         $stmt->execute();
+        $executionTime = microtime(true) - $startTime;
+        $executionTime = round($executionTime < 1 ? $executionTime * 1000 : $executionTime, $executionTime < 1 ? 0 : 2) . ($executionTime < 1 ? ' ms' : ' s');
+
         $affectedRows = $stmt->affected_rows;
         $callData = $this->_traceFunctionCalls('sql2db');
 
         $this->cml_db_update_amount();
-        $this->cml_db_update_request_query(array_merge(['query' => $query, 'params' => $params, 'affected_rows' => $affectedRows], $callData));
+        $this->cml_db_update_request_query(array_merge(['query' => $query, 'params' => $params, 'affected_rows' => $affectedRows, 'executionTime' => $executionTime], $callData));
 
         $stmt->close();
         return $affectedRows;

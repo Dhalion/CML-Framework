@@ -248,11 +248,11 @@ trait Session
      * If $data is an array, sets session values based on the key-value pairs in the array.
      * If $data is neither a string nor an array, returns null.
      *
-     * @param string|array $data The session data or key-value pairs.
+     * @param array|string $data The session data or key-value pairs.
      *
      * @return mixed|null The session data or null if not found.
      */
-    public function session($data)
+    public function session(array|string $data): mixed
     {
         $this->startSession();
         if (is_string($data)) {
@@ -273,7 +273,7 @@ trait Session
      * @param string $key The key under which the data will be stored.
      * @param mixed $value The data to be stored in the session.
      */
-    public function setSessionData(string $key, $value)
+    public function setSessionData(string $key, mixed $value)
     {
         $this->startSession();
         $_SESSION[$key] = $value;
@@ -286,7 +286,7 @@ trait Session
      *
      * @return mixed|null The data stored under the specified key, or null if not found.
      */
-    public function getSessionData(string $key)
+    public function getSessionData(string $key): mixed
     {
         $this->startSession();
         return $_SESSION[$key] ?? null;
@@ -299,7 +299,7 @@ trait Session
      *
      * @return bool True if the key exists, false otherwise.
      */
-    public function hasSessionData(string $key)
+    public function hasSessionData(string $key): bool
     {
         $this->startSession();
         return isset($_SESSION[$key]);
@@ -310,7 +310,7 @@ trait Session
      *
      * @return array An associative array of all session data.
      */
-    public function getAllSessionData()
+    public function getAllSessionData(): array
     {
         $this->startSession();
         return $_SESSION;
@@ -321,13 +321,14 @@ trait Session
      *
      * @return string The session save path.
      */
-    public function getSessionSavePath()
+    public function getSessionSavePath(): string
     {
         return session_save_path();
     }
 
     /**
      * Merges the given associative array with the existing session data.
+     * 
      * @param array $data Associative array to merge with the session data.
      */
     public function mergeSessionData(array $data)
@@ -353,7 +354,7 @@ trait Session
      *
      * @return mixed|null The data stored under the specified key, or null if not found.
      */
-    public function pullSessionData(string $key)
+    public function pullSessionData(string $key): mixed
     {
         $this->startSession();
         $value = $this->getSessionData($key);
@@ -390,7 +391,7 @@ trait Session
      *
      * @return bool True if the session has timed out, false otherwise.
      */
-    public function isSessionTimedOut()
+    public function isSessionTimedOut(): bool
     {
         $this->startSession();
         return isset($_SESSION['timeout']) && time() > $_SESSION['timeout'];
@@ -433,7 +434,7 @@ trait Session
      *
      * @return bool True if the session has been started, false otherwise.
      */
-    public function isSessionStarted()
+    public function isSessionStarted(): bool
     {
         return session_status() == PHP_SESSION_ACTIVE;
     }
