@@ -342,7 +342,7 @@ class DB
      * @return string|bool The result of the SQL query as a JSON-encoded string.
      * @throws Exception
      */
-    public function sql2jsonFile(string $fileName, array $params = []): string|bool
+    public function sqlFile2json(string $fileName, array $params = []): string|bool
     {
         if (!empty($fileName)) {
             return json_encode($this->sqlFile2array($fileName, $params));
