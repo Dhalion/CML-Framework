@@ -30,6 +30,7 @@ if (file_exists($configPath = dirname(__DIR__) . '/config/cml-config.php')) {
     trigger_error('The cml-config.php file is missing. Please ensure it exists and contains the necessary configuration constants.', E_USER_ERROR);
 }
 
+
 /**
  * Loads framework variables from cml-vars.php
  */
@@ -46,6 +47,8 @@ if (file_exists($cml_functions = __DIR__ . '/cml-functions.php')) {
     unset($cml_functions);
 }
 
+header('X-Powered-By: CML-Framework/' .  useTrait()::getFrameworkVersion() . " - PHP/" . phpversion());
+
 /**
  * Loads error handler from cml-error.php
  */
@@ -61,5 +64,3 @@ if (file_exists($functions = dirname(__DIR__, 2) . '/functions.php')) {
     require_once $functions;
     unset($functions);
 }
-
-header('X-Powered-By: CML-Framework/' .  useTrait()::getFrameworkVersion() . " - PHP/" . phpversion());
