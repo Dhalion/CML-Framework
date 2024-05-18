@@ -470,7 +470,7 @@ class DB
             $this->sql2db("CREATE TABLE `cml_data` (
                 `data_id` INT(11) NOT NULL AUTO_INCREMENT,
                 `data_name` VARCHAR(50) NULL DEFAULT NULL COLLATE 'utf8_general_ci',
-                `data_value` VARCHAR(1000) NULL DEFAULT NULL COLLATE 'utf8_general_ci',
+                `data_value` LONGTEXT NULL DEFAULT NULL COLLATE 'utf8_general_ci',
                 `data_created` DATETIME NULL DEFAULT NULL,
                 `data_lastModify` DATETIME NULL DEFAULT NULL,
                 PRIMARY KEY (`data_id`) USING BTREE,
@@ -511,6 +511,7 @@ class DB
      */
     public function getData(string $name): mixed
     {
+        $this->checkDataTable();
         $result = $this->sql2array("SELECT `data_value` FROM `cml_data` WHERE `data_name` = '$name'");
         return $result[0]['data_value'] ?? false;
     }
@@ -522,6 +523,7 @@ class DB
      */
     public function deleteData(string $name): int
     {
+        $this->checkDataTable();
         return $this->sql2db("DELETE FROM `cml_data` WHERE `data_name` = '$name'");
     }
 
