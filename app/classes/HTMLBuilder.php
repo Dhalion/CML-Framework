@@ -690,12 +690,12 @@ abstract class HTMLBuilder extends Cache
                 if (is_callable($contentSource)) {
                     $content = call_user_func($contentSource);
                     echo is_string($content) ? $content : '';
+                } elseif (is_string($contentSource)) {
+                    echo $contentSource;
                 } elseif (file_exists(self::getRootPath($contentSource))) {
                     ob_start();
                     require self::getRootPath($contentSource);
                     echo ob_get_clean();
-                } elseif (is_string($contentSource)) {
-                    echo $contentSource;
                 } else {
                     trigger_error("Invalid content source for the hook: $hookName", E_USER_WARNING);
                 }
